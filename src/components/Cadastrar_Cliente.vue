@@ -43,16 +43,14 @@
       <v-btn @click="clear"> clear </v-btn>
     </form> -->
 
-  centrilize in the middle of the screen
   <v-card class="w-50 mx-auto mt-12">
-    <v-form v-model="valid" class="w-100">
+    <v-form class="w-100">
       <v-container>
         <v-row>
           <v-col cols="12">
             <v-text-field
-              v-model="firstname"
+              v-model="nome"
               :rules="nameRules"
-              :counter="10"
               label="Nome"
               required
             ></v-text-field>
@@ -61,9 +59,8 @@
         <v-row>
           <v-col cols="12" md="6">
             <v-text-field
-              v-model="lastname"
+              v-model="sobrenome"
               :rules="nameRules"
-              :counter="10"
               label="Sobrenome"
               required
             ></v-text-field>
@@ -71,11 +68,19 @@
 
           <v-col cols="12" md="6">
             <v-text-field
-              v-model="email"
-              :rules="emailRules"
+              v-model="celular"
               label="Celular"
               required
+              :counter="11"
+              v-maska="'(##) #####-####'"
             ></v-text-field>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col cols="12" md="4" mx="auto">
+            <v-btn type="submit" @click="submit()" block class="mt-2 mx-auto"
+              >Submit</v-btn
+            >
           </v-col>
         </v-row>
       </v-container>
@@ -125,6 +130,35 @@ export default {
     }
 
     return { state, items, clear, v$ };
+  },
+  data: () => {
+    return {
+      nome: "",
+      sobrenome: "",
+      celular: "",
+    };
+  },
+  methods: {
+    submit() {
+      fetch("http://localhost:3000/v1/client", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          nome: this.nome,
+          sobrenome: this.sobrenome,
+          celular: this.celular,
+        }),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          console.log("Success:", data);
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+        });
+    },
   },
 };
 </script>
