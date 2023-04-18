@@ -79,7 +79,7 @@
         <v-row>
           <v-col cols="12" md="4" mx="auto">
             <v-btn type="submit" @click="submit()" block class="mt-2 mx-auto"
-              >Submit</v-btn
+              >Salvar</v-btn
             >
           </v-col>
         </v-row>
