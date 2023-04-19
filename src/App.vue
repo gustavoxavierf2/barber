@@ -222,6 +222,6 @@ export default {
   opacity: 90%;
   background-image: url("./assets/BackGround.jpg");
   background-size: cover;
-  margin-left: 180px;
+  margin-left: 30px;
 }
 </style>
