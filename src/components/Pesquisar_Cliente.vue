@@ -23,7 +23,7 @@
 <script>
 export default {
   mounted() {
-    // this.loadClientes();
+    this.loadClientes();
   },
   data: () => ({
     clientes: [
@@ -46,13 +46,14 @@ export default {
     ],
   }),
   methods: {
-    loadClientes() {
-      fetch("http://localhost:3000/v1/client")
-        .then((response) => response.json())
-        .then((data) => {
-          this.clientes = data;
-        });
-    },
+    // loadClientes() {
+    //   fetch("http://localhost:3000/v1/client")
+    //     .then((response) => response.json())
+    //     .then((data) => {
+    //       this.clientes = data;
+    //     });
+    // },
   },
 };
 </script>
+<style></style>

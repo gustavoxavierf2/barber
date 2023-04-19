@@ -36,12 +36,12 @@
                       class="ButtonMenu"
                       v-bind="props"
                       width="400"
-                      style="font-weight: bold; "
+                      style="font-weight: bold"
                       rounded="xl"
                     >
                       {{ moduloMenu.title }}
 
-                      <img src="./assets/Asset_Seta.png" class="Asset_Seta"/>
+                      <img src="./assets/Asset_Seta.png" class="Asset_Seta" />
                     </v-btn>
                   </div>
                 </template>
@@ -81,14 +81,18 @@
           <img src="./assets/Asset_Tubo.png" class="AssetTubo" />
         </v-app-bar>
       </div>
-
-      <router-view />
+      <v-main
+        style="min-height: 768px; display: flex; color: aliceblue"
+        class="Content"
+      >
+        <router-view />
+      </v-main>
       <!--Visualização dos componentes por meio das rotas-->
     </v-layout>
   </v-card>
 </template>
 
-<script >
+<script>
 import itensLaterais from "./components/itensLaterais.vue";
 
 export default {
@@ -175,19 +179,17 @@ export default {
   margin: 0x;
   padding-block: 0px;
   background-color: rgb(216, 213, 213);
-
 }
 
-#teste:hover{
+#teste:hover {
   background-color: rgb(145, 141, 141);
 }
-
 
 .AssetTubo {
   width: 25px;
 }
 
-.Asset_Seta{
+.Asset_Seta {
   width: 17px;
 }
 
@@ -214,7 +216,6 @@ export default {
   height: 100px;
   background-color: gray;
 }
-
 
 .Content {
   background-color: black;
