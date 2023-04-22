@@ -67,20 +67,22 @@
           </v-list-item>
         </v-list>
       </v-navigation-drawer>
-      <div style="display: flex; justify-content: center">
-        <v-app-bar height="100" color="grey-darken-2">
+      <!-- <div style="display: flex; justify-content: center"> -->
+      <v-app-bar
+        height="100"
+        color="grey-darken-2"
+        style="justify-content: center !important"
+      >
+        <div class="centralize">
           <!--<v-icon style="margin-left: 50px" icon="mdi-vuetify"></v-icon>-->
-          <img
-            src="./assets/Asset_Tubo.png"
-            class="AssetTubo"
-            style="margin-left: 50px"
-          />
+          <img src="./assets/Asset_Tubo.png" class="AssetTubo" />
           <h1 style="font-family: 'Eczar SemiBold'; margin: 0 10px">
             BARBER SYSTEM
           </h1>
           <img src="./assets/Asset_Tubo.png" class="AssetTubo" />
-        </v-app-bar>
-      </div>
+        </div>
+      </v-app-bar>
+      <!-- </div> -->
       <v-main
         style="min-height: 768px; display: flex; color: aliceblue"
         class="Content"
@@ -223,5 +225,11 @@ export default {
   background-image: url("./assets/BackGround.jpg");
   background-size: cover;
   margin-left: 30px;
+}
+.centralize {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
 }
 </style>
