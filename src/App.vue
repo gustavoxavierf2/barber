@@ -56,11 +56,7 @@
         </v-list>
       </v-navigation-drawer>
       <!-- <div style="display: flex; justify-content: center"> -->
-      <v-app-bar
-        height="100"
-        color="grey-darken-2"
-        style="justify-content: center !important"
-      >
+      <v-app-bar height="100" color="grey-darken-2">
         <div class="centralize">
           <!--<v-icon style="margin-left: 50px" icon="mdi-vuetify"></v-icon>-->
           <img src="./assets/Asset_Tubo.png" class="AssetTubo" />
