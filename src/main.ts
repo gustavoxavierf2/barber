@@ -1,7 +1,7 @@
 import { createApp } from "vue";
 import App from "./App.vue";
+import { vMaska } from "maska";
 import router from "./router";
-import Maska from "maska";
 
 import "vuetify/styles";
 import { createVuetify } from "vuetify";
@@ -19,7 +19,7 @@ const vuetify = createVuetify({
 });
 
 createApp(App)
+  .directive("maska", vMaska)
   .use(vuetify)
   .use(router)
-  .use(Maska as any)
   .mount("#app");

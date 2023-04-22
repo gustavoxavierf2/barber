@@ -1,48 +1,4 @@
 <template>
-  <!-- <form>
-      <v-text-field
-        v-model="state.name"
-        :error-messages="v$.name.$errors.map((e) => e.$message)"
-        :counter="10"
-        label="Name"
-        required
-        @input="v$.name.$touch"
-        @blur="v$.name.$touch"
-      ></v-text-field>
-
-      <v-text-field
-        v-model="state.email"
-        :error-messages="v$.email.$errors.map((e) => e.$message)"
-        label="E-mail"
-        required
-        @input="v$.email.$touch"
-        @blur="v$.email.$touch"
-        colo
-      ></v-text-field>
-
-      <v-select
-        v-model="state.select"
-        :items="items"
-        :error-messages="v$.select.$errors.map((e) => e.$message)"
-        label="Item"
-        required
-        @change="v$.select.$touch"
-        @blur="v$.select.$touch"
-      ></v-select>
-
-      <v-checkbox
-        v-model="state.checkbox"
-        :error-messages="v$.checkbox.$errors.map((e) => e.$message)"
-        label="Do you agree?"
-        required
-        @change="v$.checkbox.$touch"
-        @blur="v$.checkbox.$touch"
-      ></v-checkbox>
-
-      <v-btn class="me-4" @click="v$.$validate"> submit </v-btn>
-      <v-btn @click="clear"> clear </v-btn>
-    </form> -->
-
   <v-card class="w-50 mx-auto mt-12">
     <v-form class="w-100">
       <v-container>
@@ -65,14 +21,12 @@
               required
             ></v-text-field>
           </v-col>
-
           <v-col cols="12" md="6">
             <v-text-field
               v-model="celular"
               label="Celular"
               required
               :counter="11"
-              v-maska="'(##) #####-####'"
             ></v-text-field>
           </v-col>
         </v-row>
@@ -95,6 +49,7 @@ import Vue from "vue";
 import { reactive, ref } from "vue";
 import { useVuelidate } from "@vuelidate/core";
 import { email, required } from "@vuelidate/validators";
+import { vMaska } from "maska";
 
 export default {
   setup() {

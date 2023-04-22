@@ -31,7 +31,7 @@
                 <template v-slot:activator="{ props }">
                   <div>
                     <v-btn
-                      id="teste"
+                      id="{{i + moduloMenu.title}}"
                       size="large"
                       class="ButtonMenu"
                       v-bind="props"
@@ -39,29 +39,17 @@
                       style="font-weight: bold"
                       rounded="xl"
                     >
-                      {{ moduloMenu.title }}
-
-                      <img src="./assets/Asset_Seta.png" class="Asset_Seta" />
+                      <router-link
+                        :to="moduloMenu.link"
+                        class="w-100"
+                        style="display: block; width: 100%; padding: 15px 60px"
+                      >
+                        {{ moduloMenu.title }}
+                      </router-link>
                     </v-btn>
+                    <!-- <img src="./assets/Asset_Seta.png" class="Asset_Seta" /> -->
                   </div>
                 </template>
-
-                <v-list>
-                  <v-list-item
-                    v-for="(item, index) in moduloMenu.children"
-                    :key="index"
-                  >
-                    <v-list-item-title>
-                      <v-btn
-                        style="background-color: grey; color: antiquewhite"
-                      >
-                        <router-link :to="item.link">
-                          {{ item.title }}</router-link
-                        >
-                      </v-btn>
-                    </v-list-item-title>
-                  </v-list-item>
-                </v-list>
               </v-menu>
             </div>
           </v-list-item>
@@ -83,10 +71,7 @@
         </div>
       </v-app-bar>
       <!-- </div> -->
-      <v-main
-        style="min-height: 768px; display: flex; color: aliceblue"
-        class="Content"
-      >
+      <v-main style="min-height: 768px" class="Content">
         <router-view />
       </v-main>
       <!--Visualização dos componentes por meio das rotas-->
@@ -113,42 +98,22 @@ export default {
     menu_lateral: [
       {
         title: "Cliente",
-        children: [
-          { title: "Cadastrar", link: "/Cadastrar_Cliente" },
-          { title: "Pesquisar", link: "/Pesquisar_Cliente" },
-          { title: "Editar", link: "/Editar_Cliente" },
-          { title: "Excluir", link: "/Excluir_Cliente" },
-        ],
+        link: "/Cliente",
       },
 
       {
         title: "Funcionario",
-        children: [
-          { title: "Cadastrar", link: "/Cadastrar_Funcionario" },
-          { title: "Pesquisar", link: "/Pesquisar_Funcionario" },
-          { title: "Editar", link: "/Editar_Funcionario" },
-          { title: "Excluir", link: "/Excluir_Funcionario" },
-        ],
+        link: "/Cliente",
       },
 
       {
         title: "Servico",
-        children: [
-          { title: "Cadastrar", link: "/Cadastrar_Servico" },
-          { title: "Pesquisar", link: "/Pesquisar_Servico" },
-          { title: "Editar", link: "/Editar_Servico" },
-          { title: "Excluir", link: "/Excluir_Servico" },
-        ],
+        link: "/Cliente",
       },
 
       {
         title: "Agendamento",
-        children: [
-          { title: "Cadastrar", link: "/Cadastrar_Agendamento" },
-          { title: "Pesquisar", link: "/Pesquisar_Agendamento" },
-          { title: "Editar", link: "/Editar_Agendamento" },
-          { title: "Excluir", link: "/Excluir_Agendamento" },
-        ],
+        link: "/Cliente",
       },
     ],
 
@@ -173,6 +138,11 @@ export default {
 * {
   margin: 0px;
   padding: 0px;
+}
+
+a {
+  text-decoration: none;
+  color: black;
 }
 
 #teste {
@@ -224,7 +194,7 @@ export default {
   opacity: 90%;
   background-image: url("./assets/BackGround.jpg");
   background-size: cover;
-  margin-left: 30px;
+  /* margin-left: 30px; */
 }
 .centralize {
   display: flex;
