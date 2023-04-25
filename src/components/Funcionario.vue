@@ -3,11 +3,11 @@
     color="grey-lighten-4"
     flat
     rounded="0"
-    width="80%"
+    width="95%"
     class="mx-auto mt-5"
   >
     <v-toolbar density="compact">
-      <v-toolbar-title>Cliente</v-toolbar-title>
+      <v-toolbar-title>Funcionário</v-toolbar-title>
 
       <v-spacer></v-spacer>
 
@@ -21,7 +21,7 @@
           single-line
           clearable
           hide-details
-          @click:clear="loadClientes"
+          @click:clear="loadFuncionários;"
           @input="(event: any) => searchInput(event.target.value)"
         ></v-text-field>
       </v-card-text>
@@ -44,14 +44,31 @@
           <th class="text-left">Nome</th>
           <th class="text-left">Sobrenome</th>
           <th class="text-left">Celular</th>
+          <th class="text-left">CPF</th>
+          <th class="text-left">Endereço</th>
+          <th class="text-left">RG</th>
+          <th class="text-left">Salário</th>
+          <th class="text-left">Setor</th>
           <th class="text-left">Ação</th>
         </tr>
       </thead>
       <tbody>
-        <tr v-for="item in clientes" :key="item.id">
+        <tr v-for="item in funcionarios" :key="item.id">
           <td>{{ item.nome }}</td>
           <td>{{ item.sobrenome }}</td>
           <td>{{ item.celular }}</td>
+          <td>{{ item.cpf }}</td>
+          <td>{{ item.endereco }}</td>
+          <td>{{ item.rg }}</td>
+          <td>
+            {{
+              new Intl.NumberFormat("pt-BR", {
+                style: "currency",
+                currency: "BRL",
+              }).format(Number(item.salario))
+            }}
+          </td>
+          <td>{{ item.setor }}</td>
           <td>
             <v-btn
               icon
@@ -85,7 +102,7 @@
           <v-row>
             <v-col cols="12">
               <v-text-field
-                v-model="clientDialog.nome"
+                v-model="funcionarioDialog.nome"
                 label="Nome"
                 required
               ></v-text-field>
@@ -94,17 +111,54 @@
           <v-row>
             <v-col cols="12" md="6">
               <v-text-field
-                v-model="clientDialog.sobrenome"
+                v-model="funcionarioDialog.sobrenome"
                 label="Sobrenome"
                 required
               ></v-text-field>
             </v-col>
             <v-col cols="12" md="6">
               <v-text-field
-                v-model="clientDialog.celular"
+                v-model="funcionarioDialog.celular"
                 label="Celular"
                 required
                 :counter="11"
+              ></v-text-field>
+            </v-col>
+            <v-col cols="12" md="6">
+              <v-text-field
+                v-model="funcionarioDialog.cpf"
+                label="CPF"
+                required
+                :counter="11"
+              ></v-text-field>
+              <v-text-field
+                v-model="funcionarioDialog.endereco"
+                label="Endereco"
+                required
+                :counter="11"
+              ></v-text-field>
+            </v-col>
+            <v-col cols="12" md="6">
+              <v-text-field
+                v-model="funcionarioDialog.rg"
+                label="RG"
+                required
+                :counter="10"
+              ></v-text-field>
+              <v-text-field
+                v-model="funcionarioDialog.salario"
+                label="Salário"
+                required
+                type="number"
+                prefix="R$"
+                step="0.01"
+              ></v-text-field>
+            </v-col>
+            <v-col cols="12">
+              <v-text-field
+                v-model="funcionarioDialog.setor"
+                label="Setor"
+                required
               ></v-text-field>
             </v-col>
           </v-row>
@@ -131,21 +185,26 @@
 <script lang="ts">
 export default {
   mounted() {
-    this.loadClientes();
+    this.loadFuncionários();
   },
   data: () => ({
-    clientes: [] as any,
+    funcionarios: [] as any,
     loading: {
       searchable: false,
       tableData: false,
       creating: false,
     },
     dialogCreate: false,
-    clientDialog: {
+    funcionarioDialog: {
       id: null,
       nome: "",
       sobrenome: "",
       celular: "",
+      cpf: "",
+      endereco: "",
+      rg: "",
+      salario: null,
+      setor: "",
     },
     alert: {
       message: "",
@@ -157,22 +216,22 @@ export default {
       if (text.length > 3) {
         console.log(text);
         this.loading.searchable = true;
-        fetch("http://localhost:3000/v1/client")
+        fetch("http://localhost:3000/v1/funcionario")
           .then((response) => response.json())
           .then((data) => {
             this.loading.searchable = true;
-            this.clientes = data;
+            this.funcionarios = data;
           })
           .finally(() => {
             this.loading.searchable = true;
           });
       } else if (text.length == 0) {
-        this.loadClientes();
+        this.loadFuncionários();
       }
     },
-    loadClientes() {
+    loadFuncionários() {
       this.loading.searchable = false;
-      // this.clientes = [
+      // this.funcionários = [
       //   {
       //     id: 1,
       //     nome: "nome_1",
@@ -190,10 +249,10 @@ export default {
       //     updated_at: "2023-04-16T14:55:44.864Z",
       //   },
       // ];
-      fetch("http://localhost:3000/v1/client")
+      fetch("http://localhost:3000/v1/funcionario")
         .then((response) => response.json())
         .then((data) => {
-          this.clientes = data;
+          this.funcionarios = data;
         });
     },
 
@@ -201,64 +260,74 @@ export default {
     submit() {
       this.loading.creating = true;
       const url =
-        "http://localhost:3000/v1/client" +
-        (this.clientDialog.id ? "/" + this.clientDialog.id : "");
-      const method = this.clientDialog.id ? "PUT" : "POST";
+        "http://localhost:3000/v1/funcionario" +
+        (this.funcionarioDialog.id ? "/" + this.funcionarioDialog.id : "");
+      const method = this.funcionarioDialog.id ? "PUT" : "POST";
       fetch(url, {
         method,
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          nome: this.clientDialog.nome,
-          sobrenome: this.clientDialog.sobrenome,
-          celular: this.clientDialog.celular,
+          nome: this.funcionarioDialog.nome,
+          sobrenome: this.funcionarioDialog.sobrenome,
+          celular: this.funcionarioDialog.celular,
+          cpf: this.funcionarioDialog.cpf,
+          endereco: this.funcionarioDialog.endereco,
+          rg: this.funcionarioDialog.rg,
+          salario: this.funcionarioDialog.salario,
+          setor: this.funcionarioDialog.setor,
         }),
       })
         .then((response) => response.json())
         .then((data) => {
           console.log("Success:", data);
-          this.alert.message = "Cliente salvo com sucesso!";
+          this.alert.message = "Funcionário salvo com sucesso!";
           this.alert.isActive = true;
         })
         .catch((error) => {
-          this.alert.message = "Erro ao salvar cliente! Tente novamente.";
+          this.alert.message = "Erro ao salvar funcionário! Tente novamente.";
           this.alert.isActive = true;
         })
         .finally(() => {
           this.loading.creating = false;
           this.dialogCreate = false;
-          this.clientDialog = {
+          this.funcionarioDialog = {
             id: null,
             nome: "",
             sobrenome: "",
             celular: "",
+            cpf: "",
+            endereco: "",
+            rg: "",
+            salario: null,
+            setor: "",
           };
-          this.loadClientes();
+          this.loadFuncionários();
         });
     },
-    deleteClient(clientId: string) {
+    deleteClient(funcionarioId: string) {
       this.loading.tableData = true;
-      fetch("http://localhost:3000/v1/client/" + clientId, {
+      fetch("http://localhost:3000/v1/funcionario/" + funcionarioId, {
         method: "DELETE",
       })
         .then((response) => response.json())
         .then((data) => {
-          this.alert.message = "Cliente excluído com sucesso!";
+          this.alert.message = "Funcionário excluído com sucesso!";
           this.alert.isActive = true;
         })
         .catch((error) => {
           console.error("Error:", error);
-          this.alert.message = "Erro ao excluir cliente! Tente novamente.";
+          this.alert.message = "Erro ao excluir funcionário! Tente novamente.";
           this.alert.isActive = true;
         })
         .finally(() => {
           this.loading.tableData = false;
-          this.loadClientes();
+          this.loadFuncionários();
         });
     },
-    openEditDialog(clientInfo: any) {
-      this.clientDialog = clientInfo;
+    openEditDialog(funcionarioInfo: any) {
+      this.funcionarioDialog = funcionarioInfo;
       this.dialogCreate = true;
     },
   },

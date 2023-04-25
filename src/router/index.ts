@@ -5,6 +5,8 @@ import Pesquisar_Cliente from "../components/Pesquisar_Cliente.vue";
 import Editar_Cliente from "../components/Editar_Cliente.vue";
 import Excluir_Cliente from "../components/Excluir_Cliente.vue";
 import Cliente from "../components/Cliente.vue";
+import Funcionario from "../components/Funcionario.vue";
+import Servico from "../components/Servico.vue";
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -30,6 +32,16 @@ const routes: Array<RouteRecordRaw> = [
     path: "/Cliente",
     name: "Cliente",
     component: Cliente,
+  },
+  {
+    path: "/Funcionario",
+    name: "Funcionario",
+    component: Funcionario,
+  },
+  {
+    path: "/Servico",
+    name: "Servico",
+    component: Servico,
   },
   {
     path: "/Pesquisar_Cliente",

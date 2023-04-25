@@ -67,7 +67,7 @@
         </div>
       </v-app-bar>
       <!-- </div> -->
-      <v-main style="min-height: 768px" class="Content">
+      <v-main class="Content">
         <router-view />
       </v-main>
       <!--Visualização dos componentes por meio das rotas-->
@@ -99,12 +99,12 @@ export default {
 
       {
         title: "Funcionario",
-        link: "/Cliente",
+        link: "/Funcionario",
       },
 
       {
         title: "Servico",
-        link: "/Cliente",
+        link: "/Servico",
       },
 
       {
@@ -190,6 +190,7 @@ a {
   opacity: 90%;
   background-image: url("./assets/BackGround.jpg");
   background-size: cover;
+  min-height: 100vh;
   /* margin-left: 30px; */
 }
 .centralize {

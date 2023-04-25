@@ -7,11 +7,12 @@
     class="mx-auto mt-5"
   >
     <v-toolbar density="compact">
-      <v-toolbar-title>Cliente</v-toolbar-title>
+      <v-toolbar-title>Servico</v-toolbar-title>
 
       <v-spacer></v-spacer>
 
       <v-card-text>
+        <!-- Botao de pesquisa -->
         <v-text-field
           :loading="loading.searchable"
           density="compact"
@@ -21,11 +22,11 @@
           single-line
           clearable
           hide-details
-          @click:clear="loadClientes"
+          @click:clear="loadServicos"
           @input="(event: any) => searchInput(event.target.value)"
         ></v-text-field>
       </v-card-text>
-
+      <!-- Botão de criar -->
       <v-btn
         icon
         @click="
@@ -42,16 +43,23 @@
       <thead>
         <tr>
           <th class="text-left">Nome</th>
-          <th class="text-left">Sobrenome</th>
-          <th class="text-left">Celular</th>
+          <th class="text-left">Descricao</th>
+          <th class="text-left">Valor</th>
           <th class="text-left">Ação</th>
         </tr>
       </thead>
       <tbody>
-        <tr v-for="item in clientes" :key="item.id">
+        <tr v-for="item in servicos" :key="item.id">
           <td>{{ item.nome }}</td>
-          <td>{{ item.sobrenome }}</td>
-          <td>{{ item.celular }}</td>
+          <td>{{ item.descricao }}</td>
+          <td>
+            {{
+              new Intl.NumberFormat("pt-BR", {
+                style: "currency",
+                currency: "BRL",
+              }).format(Number(item.valor))
+            }}
+          </td>
           <td>
             <v-btn
               icon
@@ -85,7 +93,7 @@
           <v-row>
             <v-col cols="12">
               <v-text-field
-                v-model="clientDialog.nome"
+                v-model="servicoDialog.nome"
                 label="Nome"
                 required
               ></v-text-field>
@@ -94,17 +102,19 @@
           <v-row>
             <v-col cols="12" md="6">
               <v-text-field
-                v-model="clientDialog.sobrenome"
-                label="Sobrenome"
+                v-model="servicoDialog.descricao"
+                label="Descricao"
                 required
               ></v-text-field>
             </v-col>
             <v-col cols="12" md="6">
               <v-text-field
-                v-model="clientDialog.celular"
-                label="Celular"
+                v-model="servicoDialog.valor"
+                label="Valor"
                 required
-                :counter="11"
+                prefix="R$"
+                type="number"
+                step="0.01"
               ></v-text-field>
             </v-col>
           </v-row>
@@ -131,21 +141,21 @@
 <script lang="ts">
 export default {
   mounted() {
-    this.loadClientes();
+    this.loadServicos();
   },
   data: () => ({
-    clientes: [] as any,
+    servicos: [] as any,
     loading: {
       searchable: false,
       tableData: false,
       creating: false,
     },
     dialogCreate: false,
-    clientDialog: {
+    servicoDialog: {
       id: null,
       nome: "",
-      sobrenome: "",
-      celular: "",
+      descricao: "",
+      valor: "",
     },
     alert: {
       message: "",
@@ -153,26 +163,28 @@ export default {
     },
   }),
   methods: {
+    //Função para pesquisar no backend
     searchInput(text: string) {
       if (text.length > 3) {
         console.log(text);
         this.loading.searchable = true;
-        fetch("http://localhost:3000/v1/client")
+        fetch(`http://localhost:3000/v1/servico?nome=${text}`)
           .then((response) => response.json())
           .then((data) => {
             this.loading.searchable = true;
-            this.clientes = data;
+            console.log("DATA:.....", data);
+            this.servicos = data;
           })
           .finally(() => {
-            this.loading.searchable = true;
+            this.loading.searchable = false;
           });
       } else if (text.length == 0) {
-        this.loadClientes();
+        this.loadServicos();
       }
     },
-    loadClientes() {
+    loadServicos() {
       this.loading.searchable = false;
-      // this.clientes = [
+      // this.servicos = [
       //   {
       //     id: 1,
       //     nome: "nome_1",
@@ -190,10 +202,10 @@ export default {
       //     updated_at: "2023-04-16T14:55:44.864Z",
       //   },
       // ];
-      fetch("http://localhost:3000/v1/client")
+      fetch("http://localhost:3000/v1/servico")
         .then((response) => response.json())
         .then((data) => {
-          this.clientes = data;
+          this.servicos = data;
         });
     },
 
@@ -201,64 +213,64 @@ export default {
     submit() {
       this.loading.creating = true;
       const url =
-        "http://localhost:3000/v1/client" +
-        (this.clientDialog.id ? "/" + this.clientDialog.id : "");
-      const method = this.clientDialog.id ? "PUT" : "POST";
+        "http://localhost:3000/v1/servico" +
+        (this.servicoDialog.id ? "/" + this.servicoDialog.id : "");
+      const method = this.servicoDialog.id ? "PUT" : "POST";
       fetch(url, {
         method,
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          nome: this.clientDialog.nome,
-          sobrenome: this.clientDialog.sobrenome,
-          celular: this.clientDialog.celular,
+          nome: this.servicoDialog.nome,
+          descricao: this.servicoDialog.descricao,
+          valor: this.servicoDialog.valor,
         }),
       })
         .then((response) => response.json())
         .then((data) => {
           console.log("Success:", data);
-          this.alert.message = "Cliente salvo com sucesso!";
+          this.alert.message = "Servico salvo com sucesso!";
           this.alert.isActive = true;
         })
         .catch((error) => {
-          this.alert.message = "Erro ao salvar cliente! Tente novamente.";
+          this.alert.message = "Erro ao salvar servico! Tente novamente.";
           this.alert.isActive = true;
         })
         .finally(() => {
           this.loading.creating = false;
           this.dialogCreate = false;
-          this.clientDialog = {
+          this.servicoDialog = {
             id: null,
             nome: "",
-            sobrenome: "",
-            celular: "",
+            descricao: "",
+            valor: "",
           };
-          this.loadClientes();
+          this.loadServicos();
         });
     },
-    deleteClient(clientId: string) {
+    deleteClient(servicoId: string) {
       this.loading.tableData = true;
-      fetch("http://localhost:3000/v1/client/" + clientId, {
+      fetch("http://localhost:3000/v1/servico/" + servicoId, {
         method: "DELETE",
       })
         .then((response) => response.json())
         .then((data) => {
-          this.alert.message = "Cliente excluído com sucesso!";
+          this.alert.message = "Servico excluído com sucesso!";
           this.alert.isActive = true;
         })
         .catch((error) => {
           console.error("Error:", error);
-          this.alert.message = "Erro ao excluir cliente! Tente novamente.";
+          this.alert.message = "Erro ao excluir servico! Tente novamente.";
           this.alert.isActive = true;
         })
         .finally(() => {
           this.loading.tableData = false;
-          this.loadClientes();
+          this.loadServicos();
         });
     },
-    openEditDialog(clientInfo: any) {
-      this.clientDialog = clientInfo;
+    openEditDialog(servicoInfo: any) {
+      this.servicoDialog = servicoInfo;
       this.dialogCreate = true;
     },
   },
