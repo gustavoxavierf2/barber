@@ -1,146 +1,202 @@
 <template>
-      <v-card>
-      <v-layout>
-        <!--<div style="display: flex;"> -->
-          <v-navigation-drawer color="grey-darken-2" permanent :order="order" width="200"  >
-            <v-list style="padding: 0px;">
-              <v-list-item title="Barra Navegação" style="display: flex; justify-content: center ; padding-bottom: 75px">
+  <v-card>
+    <v-layout>
+      <!--<div style="display: flex;"> -->
+      <v-navigation-drawer
+        color="grey-darken-2"
+        permanent
+        :order="order"
+        width="225"
+      >
+        <v-list style="padding: 0px">
+          <div class="TituloMenu" style="padding: 15px; text-align: center">
+            <v-list-item class="TextoMenuPrincipal">
+              Menu <br />
+              Principal
+            </v-list-item>
+            <img
+              src="./assets/Asset_Tesoura.png"
+              class="AssetTesoura"
+              alt="Imagem tesoura"
+            />
+          </div>
 
-                </v-list-item>
-
-                  <v-list-item style="" v-for="(moduloMenu, i) in menu_lateral" :key="i">
-                        <div class="text-center">
-                          
-                              <v-menu :location="location">
-                                <template v-slot:activator="{ props }" >
-                                  <v-btn 
-                                    
-                                    size="large"
-                                    append-icon=""
-                                    color="primary"
-                                    v-bind="props"
-                                    width="280"
-                                    class=""
-                                      > {{moduloMenu.title}}
-                                        <v-icon  icon="mdi-vuetify"></v-icon>
-                                  </v-btn>
-                                </template>
-
-                            <v-list>
-                              <v-list-item
-                                v-for="(item, index) in moduloMenu.children"
-                                :key="index"
-                                  >
-                              <v-list-item-title>
-                                <v-btn style="background-color: grey; color:antiquewhite" >
-                                  <router-link :to="item.link" > {{ item.title }}</router-link>
-                                </v-btn>
-                              </v-list-item-title>
-                              
-                              </v-list-item>
-                            </v-list>
-                          </v-menu>
-                        </div>     
-                </v-list-item>
-                
-            </v-list>
-          </v-navigation-drawer>
-
-          <v-app-bar height="100" color="grey-darken-2">
-            <v-icon style="margin-left: 50px" icon="mdi-vuetify"></v-icon>
-            <h1>BARBER SYSTEM {{ moduloMenu }}</h1>
-            <v-icon icon="mdi-vuetify"></v-icon>
-
-          </v-app-bar>
-
-          <router-view/> <!--Visualização dos componentes por meio das rotas-->
-
-    
-      </v-layout>
-    </v-card>  
+          <v-list-item
+            style=""
+            v-for="(moduloMenu, i) in menu_lateral"
+            :key="i"
+          >
+            <div class="text-center">
+              <v-menu :location="location">
+                <template v-slot:activator="{ props }">
+                  <div>
+                    <v-btn
+                      id="{{i + moduloMenu.title}}"
+                      size="large"
+                      class="ButtonMenu"
+                      v-bind="props"
+                      width="400"
+                      style="font-weight: bold"
+                      rounded="xl"
+                    >
+                      <router-link
+                        :to="moduloMenu.link"
+                        class="w-100"
+                        style="display: block; width: 100%; padding: 15px 60px"
+                      >
+                        {{ moduloMenu.title }}
+                      </router-link>
+                    </v-btn>
+                    <!-- <img src="./assets/Asset_Seta.png" class="Asset_Seta" /> -->
+                  </div>
+                </template>
+              </v-menu>
+            </div>
+          </v-list-item>
+        </v-list>
+      </v-navigation-drawer>
+      <!-- <div style="display: flex; justify-content: center"> -->
+      <v-app-bar height="100" color="grey-darken-2">
+        <div class="centralize">
+          <!--<v-icon style="margin-left: 50px" icon="mdi-vuetify"></v-icon>-->
+          <img src="./assets/Asset_Tubo.png" class="AssetTubo" />
+          <h1 style="font-family: 'Eczar SemiBold'; margin: 0 10px">
+            BARBER SYSTEM
+          </h1>
+          <img src="./assets/Asset_Tubo.png" class="AssetTubo" />
+        </div>
+      </v-app-bar>
+      <!-- </div> -->
+      <v-main class="Content">
+        <router-view />
+      </v-main>
+      <!--Visualização dos componentes por meio das rotas-->
+    </v-layout>
+  </v-card>
 </template>
 
-<script >
-import itensLaterais from './components/itensLaterais.vue'
+<script>
+import itensLaterais from "./components/itensLaterais.vue";
 
-  export default {
-    components: {
-      itensLaterais
-    },
-    data: () => ({
-      items: [
-        { title: 'Cadastrar'},
-        { title: 'Pesquisar' },
-        { title: 'Editar' },
-        { title: 'Excluir' },
-      ],
-      location: 'end',
+export default {
+  components: {
+    itensLaterais,
+  },
+  data: () => ({
+    items: [
+      { title: "Cadastrar" },
+      { title: "Pesquisar" },
+      { title: "Editar" },
+      { title: "Excluir" },
+    ],
+    location: "end",
 
-      menu_lateral:[
-        {title: 'Cliente', children: [
-        {title: "Cadastrar", link: "/Cadastrar_Cliente"},
-        {title: "Pesquisar", link: "/Pesquisar_Cliente"},
-        {title: "Editar", link: "/Editar_Cliente"},
-        {title: "Excluir", link: "/Excluir_Cliente"}
-        ]},
-
-        {title: 'Funcionario', children: [
-        {title: "Cadastrar", link: "/Cadastrar_Funcionario"},
-        {title: "Pesquisar", link: "/Pesquisar_Funcionario"},
-        {title: "Editar", link: "/Editar_Funcionario"},
-        {title: "Excluir", link: "/Excluir_Funcionario"}
-        ]},
-
-        {title: 'Servico',  children: [
-        {title: "Cadastrar", link: "/Cadastrar_Servico"},
-        {title: "Pesquisar", link: "/Pesquisar_Servico"},
-        {title: "Editar", link: "/Editar_Servico"},
-        {title: "Excluir", link: "/Excluir_Servico"}
-        ]},
-
-
-        {title: 'Agendamento', children: [
-        {title: "Cadastrar", link: "/Cadastrar_Agendamento"},
-        {title: "Pesquisar", link: "/Pesquisar_Agendamento"},
-        {title: "Editar", link: "/Editar_Agendamento"},
-        {title: "Excluir", link: "/Excluir_Agendamento"}
-        ]}
-      ],
-      
-      props: {
-       
+    menu_lateral: [
+      {
+        title: "Cliente",
+        link: "/Cliente",
       },
-      methods: {
-        
-      } 
-    })
-  }
 
+      {
+        title: "Funcionario",
+        link: "/Funcionario",
+      },
+
+      {
+        title: "Servico",
+        link: "/Servico",
+      },
+
+      {
+        title: "Agendamento",
+        link: "/Cliente",
+      },
+    ],
+
+    props: {},
+    methods: {},
+  }),
+};
 </script>
 
 <style scoped>
-@media only screen and (min-width: 200px){
-  .Content{
+@font-face {
+  font-family: "Eczar SemiBold";
+  src: url("./assets/Eczar-VariableFont_wght.ttf");
+}
+
+@media only screen and (min-width: 200px) {
+  .Content {
     background-color: aqua;
   }
 }
 
-.TopBar{
-  height: 100px;
-  display:flex;
-  justify-content: center;
-  align-items: center;
-  background-color: gray;
-  
-  
+* {
+  margin: 0px;
+  padding: 0px;
 }
 
-.Content{
+a {
+  text-decoration: none;
+  color: black;
+}
+
+#teste {
+  display: flex !important;
+  justify-content: end !important;
+  margin: 0x;
+  padding-block: 0px;
+  background-color: rgb(216, 213, 213);
+}
+
+#teste:hover {
+  background-color: rgb(145, 141, 141);
+}
+
+.AssetTubo {
+  width: 25px;
+}
+
+.Asset_Seta {
+  width: 17px;
+}
+
+.TituloMenu {
+  display: flex;
+  justify-content: center;
+}
+
+.AssetTesoura {
+  margin-top: 20px;
+  width: 40px;
+  height: 40px;
+  text-align: center;
+}
+
+.TextoMenuPrincipal {
+  color: black;
+  font-size: 22px;
+  font-weight: bold;
+  font-family: "Eczar SemiBold";
+}
+
+.TopBar {
+  height: 100px;
+  background-color: gray;
+}
+
+.Content {
   background-color: black;
   opacity: 90%;
   background-image: url("./assets/BackGround.jpg");
   background-size: cover;
-  margin-left: 180px;
+  min-height: 100vh;
+  /* margin-left: 30px; */
 }
-
+.centralize {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
 </style>
