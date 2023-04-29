@@ -13,7 +13,8 @@
 
       <v-card-text>
         <v-text-field
-          :loading="loading.searchable"
+        :loading="loading.searchable"
+          v-model="text"
           density="compact"
           variant="underlined"
           label="Pesquisar"
@@ -22,8 +23,11 @@
           clearable
           hide-details
           @click:clear="loadFuncionários;"
-          @input="(event: any) => searchInput(event.target.value)"
-        ></v-text-field>
+          @click:append-inner="searchInput(text)"
+          
+        >
+        
+        </v-text-field> 
       </v-card-text>
 
       <v-btn
@@ -174,6 +178,7 @@
     </v-card>
   </v-dialog>
   <v-snackbar v-model="alert.isActive" :timeout="2000" location="top right">
+
     <!-- <template >
         <v-btn class="ma-2" v-bind="props">open</v-btn>
       </template> -->
@@ -189,6 +194,7 @@ export default {
   },
   data: () => ({
     funcionarios: [] as any,
+    text: "",
     loading: {
       searchable: false,
       tableData: false,
@@ -213,6 +219,38 @@ export default {
   }),
   methods: {
     searchInput(text: string) {
+      console.log(text)
+      if(text.length == 0 || text == null){
+        this.loadFuncionários();
+      } else{
+        
+        fetch("http://localhost:3000/v1/funcionario",
+        {body: JSON.stringify({
+          chave: text
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        method: "POST",
+        }
+        )
+          .then((response) => response.json())
+          .then((data) => {
+            this.loading.searchable = true;
+            this.funcionarios = data;
+            console.log(data);
+          })
+          .finally(() => {
+            this.loading.searchable = true;
+          });
+      }
+      
+        
+        //this.loading.searchable = true;
+        
+    },
+    /*
+    searchInput(text: string) {
       if (text.length > 3) {
         console.log(text);
         this.loading.searchable = true;
@@ -228,7 +266,7 @@ export default {
       } else if (text.length == 0) {
         this.loadFuncionários();
       }
-    },
+    }*/
     loadFuncionários() {
       this.loading.searchable = false;
       // this.funcionários = [
@@ -333,3 +371,8 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+
+
+</style>

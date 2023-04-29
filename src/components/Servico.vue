@@ -7,7 +7,7 @@
     class="mx-auto mt-5"
   >
     <v-toolbar density="compact">
-      <v-toolbar-title>Servico</v-toolbar-title>
+      <v-toolbar-title>Serviço</v-toolbar-title>
 
       <v-spacer></v-spacer>
 
