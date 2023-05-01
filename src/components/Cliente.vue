@@ -6,8 +6,8 @@
     width="80%"
     class="mx-auto mt-5"
   >
-    <v-toolbar density="compact">
-      <v-toolbar-title>Cliente</v-toolbar-title>
+    <v-toolbar density="compact" class="table">
+      <v-toolbar-title class="tableTitle">Cliente</v-toolbar-title>
 
       <v-spacer></v-spacer>
 
@@ -39,16 +39,16 @@
         <v-tooltip activator="parent" location="bottom">Adicionar</v-tooltip>
       </v-btn>
     </v-toolbar>
-    <v-table>
-      <thead>
+    <v-table class="contentTable">
+      <thead class="tableHead">
         <tr>
-          <th class="text-left">Nome</th>
-          <th class="text-left">Sobrenome</th>
-          <th class="text-left">Celular</th>
-          <th class="text-left">Ação</th>
+          <th class="text-left"><div class="tableColumns">Nome</div></th>
+          <th class="text-left"><div class="tableColumns">Sobrenome</div></th>
+          <th class="text-left"><div class="tableColumns">Celular</div></th>
+          <th class="text-left"><div class="tableColumns">Ação</div></th>
         </tr>
       </thead>
-      <tbody>
+      <tbody class="tableBody">
         <tr v-for="item in clientes" :key="item.id">
           <td>{{ item.nome }}</td>
           <td>{{ item.sobrenome }}</td>
@@ -77,18 +77,19 @@
           </td>
         </tr>
       </tbody>
+    
     </v-table>
   </v-card>
   <v-dialog v-model="dialogCreate">
-    <v-card class="w-50 mx-auto mt-12">
-      <v-form class="w-100">
+    <v-card class="w-50 mx-auto mt-12 table" >
+      <v-form class="w-100" fast-fail @submit.prevent>
         <v-container>
           <v-row>
             <v-col cols="12">
               <v-text-field
                 v-model="clientDialog.nome"
                 label="Nome"
-                required
+                :rules="nomeRule"
               ></v-text-field>
             </v-col>
           </v-row>
@@ -97,14 +98,14 @@
               <v-text-field
                 v-model="clientDialog.sobrenome"
                 label="Sobrenome"
-                required
+                :rules="sobrenomeRule"
               ></v-text-field>
             </v-col>
             <v-col cols="12" md="6">
               <v-text-field
                 v-model="clientDialog.celular"
                 label="Celular"
-                required
+                :rules="celularRule"
                 :counter="11"
               ></v-text-field>
             </v-col>
@@ -135,6 +136,24 @@ export default {
     this.loadClientes();
   },
   data: () => ({
+  nomeRule: [
+        value => {
+          if (value) return true
+
+          return 'Campo Obrigatório'}
+  ],
+        sobrenomeRule: [
+        value => {
+          if (value) return true
+
+          return 'Campo Obrigatório'}
+        ],
+        celularRule: [
+        value => {
+          if (value) return true
+
+          return 'Campo Obrigatório'}
+        ],
     clientes: [] as any,
     text: "",
     loading: {
@@ -203,7 +222,8 @@ export default {
 
     // },
     submit() {
-      this.loading.creating = true;
+      if(this.clientDialog.nome && this.clientDialog.sobrenome && this.clientDialog.celular){
+        this.loading.creating = true;
       const url =
         "http://localhost:3000/v1/client" +
         (this.clientDialog.id ? "/" + this.clientDialog.id : "");
@@ -240,6 +260,9 @@ export default {
           };
           this.loadClientes();
         });
+      }
+
+      
     },
     deleteClient(clientId: string) {
       this.loading.tableData = true;
@@ -268,3 +291,34 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.table{
+  background-color:#434342; 
+  background-size: cover;
+  font-family: "Eczar SemiBold";
+  color:white;
+}
+
+.tableTitle{
+  font-size: 25px;
+  font-weight: bold;
+}
+
+.tableColumns{
+  color:white;
+  font-family: "Eczar SemiBold";
+  opacity:80%;
+  font-weight: bold;
+  font-size: 17px
+}
+
+.tableHead{
+  background-color:#1C1C1C
+}
+
+.tableBody{
+  background-color:#1C1C1C;
+  color:white
+}
+</style>

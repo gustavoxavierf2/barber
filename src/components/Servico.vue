@@ -6,8 +6,8 @@
     width="80%"
     class="mx-auto mt-5"
   >
-    <v-toolbar density="compact">
-      <v-toolbar-title>Serviço</v-toolbar-title>
+    <v-toolbar density="compact" class="table">
+      <v-toolbar-title class="tableTitle">Serviço</v-toolbar-title>
 
       <v-spacer></v-spacer>
 
@@ -40,16 +40,16 @@
         <v-tooltip activator="parent" location="bottom">Adicionar</v-tooltip>
       </v-btn>
     </v-toolbar>
-    <v-table>
-      <thead>
+    <v-table class="contentTable">
+      <thead class="tableHead">
         <tr>
-          <th class="text-left">Nome</th>
-          <th class="text-left">Descricao</th>
-          <th class="text-left">Valor</th>
-          <th class="text-left">Ação</th>
+          <th class="text-left"><div class="tableColumns">Nome</div></th>
+          <th class="text-left"><div class="tableColumns">Descricao</div></th>
+          <th class="text-left"><div class="tableColumns">Valor</div></th>
+          <th class="text-left"><div class="tableColumns">Ação</div></th>
         </tr>
       </thead>
-      <tbody>
+      <tbody class="tableBody">
         <tr v-for="item in servicos" :key="item.id">
           <td>{{ item.nome }}</td>
           <td>{{ item.descricao }}</td>
@@ -88,15 +88,15 @@
     </v-table>
   </v-card>
   <v-dialog v-model="dialogCreate">
-    <v-card class="w-50 mx-auto mt-12">
-      <v-form class="w-100">
+    <v-card class="w-50 mx-auto mt-12 table">
+      <v-form class="w-100" @submit.prevent>
         <v-container>
           <v-row>
             <v-col cols="12">
               <v-text-field
                 v-model="servicoDialog.nome"
                 label="Nome"
-                required
+                :rules="nomeRule"
               ></v-text-field>
             </v-col>
           </v-row>
@@ -105,14 +105,14 @@
               <v-text-field
                 v-model="servicoDialog.descricao"
                 label="Descricao"
-                required
+                :rules="descricaoRule"
               ></v-text-field>
             </v-col>
             <v-col cols="12" md="6">
               <v-text-field
                 v-model="servicoDialog.valor"
                 label="Valor"
-                required
+                :rules="valorRule"
                 prefix="R$"
                 type="number"
                 step="0.01"
@@ -141,6 +141,24 @@ export default {
     this.loadServicos();
   },
   data: () => ({
+    nomeRule: [
+        value => {
+          if (value) return true
+         return 'Campo Obrigatório'}
+    ],
+  descricaoRule: [
+        value => {
+          if (value) return true
+         return 'Campo Obrigatório'}
+  ],
+  valorRule: [
+        value => {
+          if (value) return true
+         return 'Campo Obrigatório'}
+  ],
+
+
+
     servicos: [] as any,
     text: "",
     loading: {
@@ -209,7 +227,9 @@ export default {
 
     // },
     submit() {
-      this.loading.creating = true;
+
+      if(this.servicoDialog.nome && this.servicoDialog.descricao && this.servicoDialog.valor){
+        this.loading.creating = true;
       const url =
         "http://localhost:3000/v1/servico" +
         (this.servicoDialog.id ? "/" + this.servicoDialog.id : "");
@@ -246,6 +266,10 @@ export default {
           };
           this.loadServicos();
         });
+      }else{
+        this.dialogCreate = true
+      }
+      
     },
     deleteClient(servicoId: string) {
       this.loading.tableData = true;
@@ -274,3 +298,36 @@ export default {
   },
 };
 </script>
+
+
+<style scoped>
+.table{
+  background-color:#434342; 
+  background-size: cover;
+  font-family: "Eczar SemiBold";
+  color:white;
+}
+
+.tableTitle{
+  font-size: 25px;
+  font-weight: bold;
+}
+
+.tableColumns{
+  color:white;
+  font-family: "Eczar SemiBold";
+  opacity:80%;
+  font-weight: bold;
+  font-size: 17px
+}
+
+.tableHead{
+  background-color:#1C1C1C
+}
+
+.tableBody{
+  background-color:#1C1C1C;
+  color:white
+}
+
+</style>

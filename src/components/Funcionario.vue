@@ -6,8 +6,8 @@
     width="95%"
     class="mx-auto mt-5"
   >
-    <v-toolbar density="compact">
-      <v-toolbar-title>Funcionário</v-toolbar-title>
+    <v-toolbar density="compact" class="table">
+      <v-toolbar-title class="tableTitle">Funcionário</v-toolbar-title>
 
       <v-spacer></v-spacer>
 
@@ -42,21 +42,21 @@
         <v-tooltip activator="parent" location="bottom">Adicionar</v-tooltip>
       </v-btn>
     </v-toolbar>
-    <v-table>
-      <thead>
+    <v-table class="contentTable">
+      <thead class="tableHead">
         <tr>
-          <th class="text-left">Nome</th>
-          <th class="text-left">Sobrenome</th>
-          <th class="text-left">Celular</th>
-          <th class="text-left">CPF</th>
-          <th class="text-left">Endereço</th>
-          <th class="text-left">RG</th>
-          <th class="text-left">Salário</th>
-          <th class="text-left">Setor</th>
-          <th class="text-left">Ação</th>
+          <th class="text-left"><div class="tableColumns">Nome</div></th>
+          <th class="text-left"><div class="tableColumns">Sobrenome</div></th>
+          <th class="text-left"><div class="tableColumns">Celular</div></th>
+          <th class="text-left"><div class="tableColumns">CPF</div></th>
+          <th class="text-left"><div class="tableColumns">Endereço</div></th>
+          <th class="text-left"><div class="tableColumns">RG</div></th>
+          <th class="text-left"><div class="tableColumns">Salário</div></th>
+          <th class="text-left"><div class="tableColumns">Setor</div></th>
+          <th class="text-left"><div class="tableColumns">Ação</div></th>
         </tr>
       </thead>
-      <tbody>
+      <tbody class="tableBody">
         <tr v-for="item in funcionarios" :key="item.id">
           <td>{{ item.nome }}</td>
           <td>{{ item.sobrenome }}</td>
@@ -100,15 +100,15 @@
     </v-table>
   </v-card>
   <v-dialog v-model="dialogCreate">
-    <v-card class="w-50 mx-auto mt-12">
-      <v-form class="w-100">
+    <v-card class="w-50 mx-auto mt-12 table">
+      <v-form class="w-100" @submit.prevent>
         <v-container>
           <v-row>
             <v-col cols="12">
               <v-text-field
                 v-model="funcionarioDialog.nome"
                 label="Nome"
-                required
+                :rules="nomeRule"
               ></v-text-field>
             </v-col>
           </v-row>
@@ -117,14 +117,14 @@
               <v-text-field
                 v-model="funcionarioDialog.sobrenome"
                 label="Sobrenome"
-                required
+                :rules="sobrenomeRule"
               ></v-text-field>
             </v-col>
             <v-col cols="12" md="6">
               <v-text-field
                 v-model="funcionarioDialog.celular"
                 label="Celular"
-                required
+                :rules="celularRule"
                 :counter="11"
               ></v-text-field>
             </v-col>
@@ -132,13 +132,13 @@
               <v-text-field
                 v-model="funcionarioDialog.cpf"
                 label="CPF"
-                required
+                :rules="cpfRule"
                 :counter="11"
               ></v-text-field>
               <v-text-field
                 v-model="funcionarioDialog.endereco"
                 label="Endereco"
-                required
+                :rules="enderecoRule"
                 :counter="11"
               ></v-text-field>
             </v-col>
@@ -146,13 +146,13 @@
               <v-text-field
                 v-model="funcionarioDialog.rg"
                 label="RG"
-                required
+                :rules="rgRule"
                 :counter="10"
               ></v-text-field>
               <v-text-field
                 v-model="funcionarioDialog.salario"
                 label="Salário"
-                required
+                :rules="salarioRule"
                 type="number"
                 prefix="R$"
                 step="0.01"
@@ -162,7 +162,7 @@
               <v-text-field
                 v-model="funcionarioDialog.setor"
                 label="Setor"
-                required
+                :rules="setorRule"
               ></v-text-field>
             </v-col>
           </v-row>
@@ -193,6 +193,57 @@ export default {
     this.loadFuncionários();
   },
   data: () => ({
+    nomeRule: [
+        value => {
+          if (value) return true
+         return 'Campo Obrigatório'}
+  ],
+  sobrenomeRule: [
+        value => {
+          if (value) return true
+         return 'Campo Obrigatório'}
+  ],
+
+  celularRule: [
+        value => {
+          if (value) return true
+         return 'Campo Obrigatório'}
+  ],
+
+  cpfRule: [
+        value => {
+          if (value) return true
+         return 'Campo Obrigatório'}
+  ],
+
+  enderecoRule: [
+        value => {
+          if (value) return true
+         return 'Campo Obrigatório'}
+  ],
+
+  rgRule: [
+        value => {
+          if (value) return true
+         return 'Campo Obrigatório'}
+  ],
+
+  salarioRule: [
+        value => {
+          if (value) return true
+         return 'Campo Obrigatório'}
+  ],
+
+  setorRule: [
+        value => {
+          if (value) return true
+         return 'Campo Obrigatório'}
+  ],
+
+
+
+
+
     funcionarios: [] as any,
     text: "",
     loading: {
@@ -287,7 +338,16 @@ export default {
 
     // },
     submit() {
-      this.loading.creating = true;
+      if(this.funcionarioDialog.celular &&
+       this.funcionarioDialog.cpf &&
+       this.funcionarioDialog.endereco &&
+       this.funcionarioDialog.nome &&
+       this.funcionarioDialog.rg &&
+       this.funcionarioDialog.salario &&
+       this.funcionarioDialog.setor &&
+       this.funcionarioDialog.sobrenome 
+       ){
+        this.loading.creating = true;
       const url =
         "http://localhost:3000/v1/funcionario" +
         (this.funcionarioDialog.id ? "/" + this.funcionarioDialog.id : "");
@@ -334,6 +394,7 @@ export default {
           };
           this.loadFuncionários();
         });
+      }
     },
     deleteClient(funcionarioId: string) {
       this.loading.tableData = true;
@@ -364,6 +425,33 @@ export default {
 </script>
 
 <style scoped>
+.table{
+  background-color:#434342; 
+  background-size: cover;
+  font-family: "Eczar SemiBold";
+  color:white;
+}
 
+.tableTitle{
+  font-size: 25px;
+  font-weight: bold;
+}
+
+.tableColumns{
+  color:white;
+  font-family: "Eczar SemiBold";
+  opacity:80%;
+  font-weight: bold;
+  font-size: 17px
+}
+
+.tableHead{
+  background-color:#1C1C1C
+}
+
+.tableBody{
+  background-color:#1C1C1C;
+  color:white
+}
 
 </style>
