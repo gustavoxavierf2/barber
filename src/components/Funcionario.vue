@@ -22,7 +22,7 @@
           single-line
           clearable
           hide-details
-          @click:clear="loadFuncionários;"
+          @click:clear="loadFuncionários"
           @click:append-inner="searchInput(text)"
           
         >
@@ -187,7 +187,7 @@
   </v-snackbar>
 </template>
 
-<script lang="ts">
+<script lang="ts" >
 export default {
   mounted() {
     this.loadFuncionários();
@@ -223,16 +223,7 @@ export default {
       if(text.length == 0 || text == null){
         this.loadFuncionários();
       } else{
-        
-        fetch("http://localhost:3000/v1/funcionario",
-        {body: JSON.stringify({
-          chave: text
-        }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-        method: "POST",
-        }
+        fetch(`http://localhost:3000/v1/funcionario?nome=${text}`
         )
           .then((response) => response.json())
           .then((data) => {

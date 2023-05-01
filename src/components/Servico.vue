@@ -14,6 +14,7 @@
       <v-card-text>
         <!-- Botao de pesquisa -->
         <v-text-field
+          v-model="text"
           :loading="loading.searchable"
           density="compact"
           variant="underlined"
@@ -22,8 +23,8 @@
           single-line
           clearable
           hide-details
-          @click:clear="loadServicos"
-          @input="(event: any) => searchInput(event.target.value)"
+          @click:clear="loadServicos()"
+          @click:append-inner="searchInput(text)"
         ></v-text-field>
       </v-card-text>
       <!-- Botão de criar -->
@@ -130,10 +131,6 @@
     </v-card>
   </v-dialog>
   <v-snackbar v-model="alert.isActive" :timeout="2000" location="top right">
-    <!-- <template >
-        <v-btn class="ma-2" v-bind="props">open</v-btn>
-      </template> -->
-
     {{ alert.message }}
   </v-snackbar>
 </template>
@@ -145,6 +142,7 @@ export default {
   },
   data: () => ({
     servicos: [] as any,
+    text: "",
     loading: {
       searchable: false,
       tableData: false,
@@ -165,22 +163,22 @@ export default {
   methods: {
     //Função para pesquisar no backend
     searchInput(text: string) {
-      if (text.length > 3) {
-        console.log(text);
-        this.loading.searchable = true;
-        fetch(`http://localhost:3000/v1/servico?nome=${text}`)
+      
+        if(text.length == 0 || text == null){
+          this.loadServicos();
+        }else{
+          fetch(`http://localhost:3000/v1/servico?nome=${text}`)
           .then((response) => response.json())
           .then((data) => {
             this.loading.searchable = true;
-            console.log("DATA:.....", data);
+            
             this.servicos = data;
           })
           .finally(() => {
             this.loading.searchable = false;
           });
-      } else if (text.length == 0) {
-        this.loadServicos();
-      }
+        }
+        this.loading.searchable = true;
     },
     loadServicos() {
       this.loading.searchable = false;

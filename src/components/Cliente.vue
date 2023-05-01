@@ -14,6 +14,7 @@
       <v-card-text>
         <v-text-field
           :loading="loading.searchable"
+          v-model="text"
           density="compact"
           variant="underlined"
           label="Pesquisar"
@@ -22,7 +23,7 @@
           clearable
           hide-details
           @click:clear="loadClientes"
-          @input="(event: any) => searchInput(event.target.value)"
+          @click:append-inner="searchInput(text)"
         ></v-text-field>
       </v-card-text>
 
@@ -128,13 +129,14 @@
   </v-snackbar>
 </template>
 
-<script lang="ts" >
+<script lang="ts">
 export default {
   mounted() {
     this.loadClientes();
   },
   data: () => ({
     clientes: [] as any,
+    text: "",
     loading: {
       searchable: false,
       tableData: false,
@@ -154,10 +156,13 @@ export default {
   }),
   methods: {
     searchInput(text: string) {
-      if (text.length > 3) {
+      //if (text.length > 3) {
         console.log(text);
-        this.loading.searchable = true;
-        fetch("http://localhost:3000/v1/client")
+        if(text.length == 0 || text == null){
+          this.loadClientes();
+        }else{
+          
+          fetch(`http://localhost:3000/v1/client?nome=${text}`)
           .then((response) => response.json())
           .then((data) => {
             this.loading.searchable = true;
@@ -166,9 +171,8 @@ export default {
           .finally(() => {
             this.loading.searchable = true;
           });
-      } else if (text.length == 0) {
-        this.loadClientes();
-      }
+        }
+        //this.loading.searchable = true;
     },
     loadClientes() {
       this.loading.searchable = false;
