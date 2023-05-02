@@ -6,24 +6,24 @@
     width="80%"
     class="mx-auto mt-5"
   >
-    <v-toolbar density="compact">
-      <v-toolbar-title>Cliente</v-toolbar-title>
+    <v-toolbar density="compact" class="table">
+      <v-toolbar-title class="tableTitle">Cliente</v-toolbar-title>
 
       <v-spacer></v-spacer>
 
       <v-card-text>
         <v-text-field
           :loading="loading.searchable"
+          v-model="text"
           density="compact"
           variant="underlined"
           label="Pesquisar"
           append-inner-icon="mdi-magnify"
           single-line
-          v-model="search"
           clearable
           hide-details
           @click:clear="loadClientes"
-          @click:append-inner="searchInput"
+          @click:append-inner="searchInput(text)"
         ></v-text-field>
       </v-card-text>
 
@@ -39,16 +39,16 @@
         <v-tooltip activator="parent" location="bottom">Adicionar</v-tooltip>
       </v-btn>
     </v-toolbar>
-    <v-table>
-      <thead>
+    <v-table class="contentTable">
+      <thead class="tableHead">
         <tr>
-          <th class="text-left">Nome</th>
-          <th class="text-left">Sobrenome</th>
-          <th class="text-left">Celular</th>
-          <th class="text-left">Ação</th>
+          <th class="text-left"><div class="tableColumns">Nome</div></th>
+          <th class="text-left"><div class="tableColumns">Sobrenome</div></th>
+          <th class="text-left"><div class="tableColumns">Celular</div></th>
+          <th class="text-left"><div class="tableColumns">Ação</div></th>
         </tr>
       </thead>
-      <tbody>
+      <tbody class="tableBody">
         <tr v-for="item in clientes" :key="item.id">
           <td>{{ item.nome }}</td>
           <td>{{ item.sobrenome }}</td>
@@ -80,15 +80,15 @@
     </v-table>
   </v-card>
   <v-dialog v-model="dialogCreate">
-    <v-card class="w-50 mx-auto mt-12">
-      <v-form class="w-100">
+    <v-card class="w-50 mx-auto mt-12 table">
+      <v-form class="w-100" fast-fail @submit.prevent>
         <v-container>
           <v-row>
             <v-col cols="12">
               <v-text-field
                 v-model="clientDialog.nome"
                 label="Nome"
-                required
+                :rules="nomeRule"
               ></v-text-field>
             </v-col>
           </v-row>
@@ -97,14 +97,14 @@
               <v-text-field
                 v-model="clientDialog.sobrenome"
                 label="Sobrenome"
-                required
+                :rules="sobrenomeRule"
               ></v-text-field>
             </v-col>
             <v-col cols="12" md="6">
               <v-text-field
                 v-model="clientDialog.celular"
                 label="Celular"
-                required
+                :rules="celularRule"
                 :counter="11"
               ></v-text-field>
             </v-col>
@@ -135,8 +135,29 @@ export default {
     this.loadClientes();
   },
   data: () => ({
+    nomeRule: [
+      (value) => {
+        if (value) return true;
+
+        return "Campo Obrigatório";
+      },
+    ],
+    sobrenomeRule: [
+      (value) => {
+        if (value) return true;
+
+        return "Campo Obrigatório";
+      },
+    ],
+    celularRule: [
+      (value) => {
+        if (value) return true;
+
+        return "Campo Obrigatório";
+      },
+    ],
     clientes: [] as any,
-    search: "",
+    text: "",
     loading: {
       searchable: false,
       tableData: false,
@@ -155,19 +176,23 @@ export default {
     },
   }),
   methods: {
-    searchInput() {
-      console.log(this.search);
-      this.loading.searchable = true;
-      fetch("http://localhost:3000/v1/client?nome=" + this.search)
-        .then((response) => response.json())
-        .then((data) => {
-          this.loading.searchable = true;
-          console.log(data);
-          this.clientes = data;
-        })
-        .finally(() => {
-          this.loading.searchable = false;
-        });
+    searchInput(text: string) {
+      //if (text.length > 3) {
+      console.log(text);
+      if (text.length == 0 || text == null) {
+        this.loadClientes();
+      } else {
+        fetch(`http://localhost:3000/v1/client?nome=${text}`)
+          .then((response) => response.json())
+          .then((data) => {
+            this.loading.searchable = true;
+            this.clientes = data;
+          })
+          .finally(() => {
+            this.loading.searchable = true;
+          });
+      }
+      //this.loading.searchable = true;
     },
     loadClientes() {
       this.loading.searchable = false;
@@ -199,43 +224,49 @@ export default {
 
     // },
     submit() {
-      this.loading.creating = true;
-      const url =
-        "http://localhost:3000/v1/client" +
-        (this.clientDialog.id ? "/" + this.clientDialog.id : "");
-      const method = this.clientDialog.id ? "PUT" : "POST";
-      fetch(url, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          nome: this.clientDialog.nome,
-          sobrenome: this.clientDialog.sobrenome,
-          celular: this.clientDialog.celular,
-        }),
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          console.log("Success:", data);
-          this.alert.message = "Cliente salvo com sucesso!";
-          this.alert.isActive = true;
+      if (
+        this.clientDialog.nome &&
+        this.clientDialog.sobrenome &&
+        this.clientDialog.celular
+      ) {
+        this.loading.creating = true;
+        const url =
+          "http://localhost:3000/v1/client" +
+          (this.clientDialog.id ? "/" + this.clientDialog.id : "");
+        const method = this.clientDialog.id ? "PUT" : "POST";
+        fetch(url, {
+          method,
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            nome: this.clientDialog.nome,
+            sobrenome: this.clientDialog.sobrenome,
+            celular: this.clientDialog.celular,
+          }),
         })
-        .catch((error) => {
-          this.alert.message = "Erro ao salvar cliente! Tente novamente.";
-          this.alert.isActive = true;
-        })
-        .finally(() => {
-          this.loading.creating = false;
-          this.dialogCreate = false;
-          this.clientDialog = {
-            id: null,
-            nome: "",
-            sobrenome: "",
-            celular: "",
-          };
-          this.loadClientes();
-        });
+          .then((response) => response.json())
+          .then((data) => {
+            console.log("Success:", data);
+            this.alert.message = "Cliente salvo com sucesso!";
+            this.alert.isActive = true;
+          })
+          .catch((error) => {
+            this.alert.message = "Erro ao salvar cliente! Tente novamente.";
+            this.alert.isActive = true;
+          })
+          .finally(() => {
+            this.loading.creating = false;
+            this.dialogCreate = false;
+            this.clientDialog = {
+              id: null,
+              nome: "",
+              sobrenome: "",
+              celular: "",
+            };
+            this.loadClientes();
+          });
+      }
     },
     deleteClient(clientId: string) {
       this.loading.tableData = true;
@@ -264,3 +295,34 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.table {
+  background-color: #434342;
+  background-size: cover;
+  font-family: "Eczar SemiBold";
+  color: white;
+}
+
+.tableTitle {
+  font-size: 25px;
+  font-weight: bold;
+}
+
+.tableColumns {
+  color: white;
+  font-family: "Eczar SemiBold";
+  opacity: 80%;
+  font-weight: bold;
+  font-size: 17px;
+}
+
+.tableHead {
+  background-color: #1c1c1c;
+}
+
+.tableBody {
+  background-color: #1c1c1c;
+  color: white;
+}
+</style>
