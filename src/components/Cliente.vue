@@ -19,10 +19,11 @@
           label="Pesquisar"
           append-inner-icon="mdi-magnify"
           single-line
+          v-model="search"
           clearable
           hide-details
           @click:clear="loadClientes"
-          @input="(event: any) => searchInput(event.target.value)"
+          @click:append-inner="searchInput"
         ></v-text-field>
       </v-card-text>
 
@@ -135,6 +136,7 @@ export default {
   },
   data: () => ({
     clientes: [] as any,
+    search: "",
     loading: {
       searchable: false,
       tableData: false,
@@ -153,25 +155,23 @@ export default {
     },
   }),
   methods: {
-    searchInput(text: string) {
-      if (text.length > 3) {
-        console.log(text);
-        this.loading.searchable = true;
-        fetch("http://localhost:3000/v1/client")
-          .then((response) => response.json())
-          .then((data) => {
-            this.loading.searchable = true;
-            this.clientes = data;
-          })
-          .finally(() => {
-            this.loading.searchable = true;
-          });
-      } else if (text.length == 0) {
-        this.loadClientes();
-      }
+    searchInput() {
+      console.log(this.search);
+      this.loading.searchable = true;
+      fetch("http://localhost:3000/v1/client?nome=" + this.search)
+        .then((response) => response.json())
+        .then((data) => {
+          this.loading.searchable = true;
+          console.log(data);
+          this.clientes = data;
+        })
+        .finally(() => {
+          this.loading.searchable = false;
+        });
     },
     loadClientes() {
       this.loading.searchable = false;
+      this.search = "";
       // this.clientes = [
       //   {
       //     id: 1,

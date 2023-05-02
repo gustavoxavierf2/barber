@@ -19,10 +19,11 @@
           label="Pesquisar"
           append-inner-icon="mdi-magnify"
           single-line
+          v-model="search"
           clearable
           hide-details
-          @click:clear="loadFuncionários;"
-          @input="(event: any) => searchInput(event.target.value)"
+          @click:clear="loadFuncionarios"
+          @click:append-inner="searchInput"
         ></v-text-field>
       </v-card-text>
 
@@ -185,10 +186,11 @@
 <script lang="ts">
 export default {
   mounted() {
-    this.loadFuncionários();
+    this.loadFuncionarios();
   },
   data: () => ({
     funcionarios: [] as any,
+    search: "",
     loading: {
       searchable: false,
       tableData: false,
@@ -212,25 +214,28 @@ export default {
     },
   }),
   methods: {
-    searchInput(text: string) {
-      if (text.length > 3) {
-        console.log(text);
-        this.loading.searchable = true;
-        fetch("http://localhost:3000/v1/funcionario")
-          .then((response) => response.json())
-          .then((data) => {
-            this.loading.searchable = true;
-            this.funcionarios = data;
-          })
-          .finally(() => {
-            this.loading.searchable = true;
-          });
-      } else if (text.length == 0) {
-        this.loadFuncionários();
+    searchInput() {
+      console.log(this.search);
+      this.loading.searchable = true;
+      let url = "http://localhost:3000/v1/funcionario";
+      if (this.search.match(/\d/)) {
+        url += `?cpf=${this.search}`;
+      } else {
+        url += `?nome=${this.search}`;
       }
+      fetch(url)
+        .then((response) => response.json())
+        .then((data) => {
+          this.loading.searchable = true;
+          this.funcionarios = data;
+        })
+        .finally(() => {
+          this.loading.searchable = false;
+        });
     },
-    loadFuncionários() {
+    loadFuncionarios() {
       this.loading.searchable = false;
+      this.search = "";
       // this.funcionários = [
       //   {
       //     id: 1,
@@ -303,7 +308,7 @@ export default {
             salario: null,
             setor: "",
           };
-          this.loadFuncionários();
+          this.loadFuncionarios();
         });
     },
     deleteClient(funcionarioId: string) {
@@ -323,7 +328,7 @@ export default {
         })
         .finally(() => {
           this.loading.tableData = false;
-          this.loadFuncionários();
+          this.loadFuncionarios();
         });
     },
     openEditDialog(funcionarioInfo: any) {

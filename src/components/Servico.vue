@@ -22,8 +22,9 @@
           single-line
           clearable
           hide-details
+          v-model="search"
           @click:clear="loadServicos"
-          @input="(event: any) => searchInput(event.target.value)"
+          @click:append-inner="searchInput"
         ></v-text-field>
       </v-card-text>
       <!-- Botão de criar -->
@@ -145,6 +146,7 @@ export default {
   },
   data: () => ({
     servicos: [] as any,
+    search: "",
     loading: {
       searchable: false,
       tableData: false,
@@ -164,26 +166,23 @@ export default {
   }),
   methods: {
     //Função para pesquisar no backend
-    searchInput(text: string) {
-      if (text.length > 3) {
-        console.log(text);
-        this.loading.searchable = true;
-        fetch(`http://localhost:3000/v1/servico?nome=${text}`)
-          .then((response) => response.json())
-          .then((data) => {
-            this.loading.searchable = true;
-            console.log("DATA:.....", data);
-            this.servicos = data;
-          })
-          .finally(() => {
-            this.loading.searchable = false;
-          });
-      } else if (text.length == 0) {
-        this.loadServicos();
-      }
+    searchInput() {
+      console.log(this.search);
+      this.loading.searchable = true;
+      fetch(`http://localhost:3000/v1/servico?nome=${this.search}`)
+        .then((response) => response.json())
+        .then((data) => {
+          this.loading.searchable = true;
+          console.log("DATA:.....", data);
+          this.servicos = data;
+        })
+        .finally(() => {
+          this.loading.searchable = false;
+        });
     },
     loadServicos() {
       this.loading.searchable = false;
+      this.search = "";
       // this.servicos = [
       //   {
       //     id: 1,
