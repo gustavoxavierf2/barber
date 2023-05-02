@@ -20,7 +20,6 @@
           label="Pesquisar"
           append-inner-icon="mdi-magnify"
           single-line
-          v-model="search"
           clearable
           hide-details
           @click:clear="loadClientes"

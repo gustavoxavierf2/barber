@@ -20,10 +20,9 @@
           label="Pesquisar"
           append-inner-icon="mdi-magnify"
           single-line
-          v-model="search"
           clearable
           hide-details
-          @click:clear="loadFuncionários;"
+          @click:clear="loadFuncionarios"
           @click:append-inner="searchInput(text)"
         >
         </v-text-field>
@@ -308,7 +307,7 @@ export default {
         this.loadFuncionários();
       }
     }*/
-    loadFuncionários() {
+    loadFuncionarios() {
       this.loading.searchable = false;
       this.search = "";
       // this.funcionários = [
