@@ -142,22 +142,23 @@ export default {
   },
   data: () => ({
     nomeRule: [
-        value => {
-          if (value) return true
-         return 'Campo Obrigatório'}
+      (value) => {
+        if (value) return true;
+        return "Campo Obrigatório";
+      },
     ],
-  descricaoRule: [
-        value => {
-          if (value) return true
-         return 'Campo Obrigatório'}
-  ],
-  valorRule: [
-        value => {
-          if (value) return true
-         return 'Campo Obrigatório'}
-  ],
-
-
+    descricaoRule: [
+      (value) => {
+        if (value) return true;
+        return "Campo Obrigatório";
+      },
+    ],
+    valorRule: [
+      (value) => {
+        if (value) return true;
+        return "Campo Obrigatório";
+      },
+    ],
 
     servicos: [] as any,
     text: "",
@@ -181,25 +182,25 @@ export default {
   methods: {
     //Função para pesquisar no backend
     searchInput(text: string) {
-      
-        if(text.length == 0 || text == null){
-          this.loadServicos();
-        }else{
-          fetch(`http://localhost:3000/v1/servico?nome=${text}`)
+      if (text.length == 0 || text == null) {
+        this.loadServicos();
+      } else {
+        fetch(`http://localhost:3000/v1/servico?nome=${text}`)
           .then((response) => response.json())
           .then((data) => {
             this.loading.searchable = true;
-            
+
             this.servicos = data;
           })
           .finally(() => {
             this.loading.searchable = false;
           });
-        }
-        this.loading.searchable = true;
+      }
+      this.loading.searchable = true;
     },
     loadServicos() {
       this.loading.searchable = false;
+      this.search = "";
       // this.servicos = [
       //   {
       //     id: 1,
@@ -227,49 +228,51 @@ export default {
 
     // },
     submit() {
-
-      if(this.servicoDialog.nome && this.servicoDialog.descricao && this.servicoDialog.valor){
+      if (
+        this.servicoDialog.nome &&
+        this.servicoDialog.descricao &&
+        this.servicoDialog.valor
+      ) {
         this.loading.creating = true;
-      const url =
-        "http://localhost:3000/v1/servico" +
-        (this.servicoDialog.id ? "/" + this.servicoDialog.id : "");
-      const method = this.servicoDialog.id ? "PUT" : "POST";
-      fetch(url, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          nome: this.servicoDialog.nome,
-          descricao: this.servicoDialog.descricao,
-          valor: this.servicoDialog.valor,
-        }),
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          console.log("Success:", data);
-          this.alert.message = "Servico salvo com sucesso!";
-          this.alert.isActive = true;
+        const url =
+          "http://localhost:3000/v1/servico" +
+          (this.servicoDialog.id ? "/" + this.servicoDialog.id : "");
+        const method = this.servicoDialog.id ? "PUT" : "POST";
+        fetch(url, {
+          method,
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            nome: this.servicoDialog.nome,
+            descricao: this.servicoDialog.descricao,
+            valor: this.servicoDialog.valor,
+          }),
         })
-        .catch((error) => {
-          this.alert.message = "Erro ao salvar servico! Tente novamente.";
-          this.alert.isActive = true;
-        })
-        .finally(() => {
-          this.loading.creating = false;
-          this.dialogCreate = false;
-          this.servicoDialog = {
-            id: null,
-            nome: "",
-            descricao: "",
-            valor: "",
-          };
-          this.loadServicos();
-        });
-      }else{
-        this.dialogCreate = true
+          .then((response) => response.json())
+          .then((data) => {
+            console.log("Success:", data);
+            this.alert.message = "Servico salvo com sucesso!";
+            this.alert.isActive = true;
+          })
+          .catch((error) => {
+            this.alert.message = "Erro ao salvar servico! Tente novamente.";
+            this.alert.isActive = true;
+          })
+          .finally(() => {
+            this.loading.creating = false;
+            this.dialogCreate = false;
+            this.servicoDialog = {
+              id: null,
+              nome: "",
+              descricao: "",
+              valor: "",
+            };
+            this.loadServicos();
+          });
+      } else {
+        this.dialogCreate = true;
       }
-      
     },
     deleteClient(servicoId: string) {
       this.loading.tableData = true;
@@ -299,35 +302,33 @@ export default {
 };
 </script>
 
-
 <style scoped>
-.table{
-  background-color:#434342; 
+.table {
+  background-color: #434342;
   background-size: cover;
   font-family: "Eczar SemiBold";
-  color:white;
+  color: white;
 }
 
-.tableTitle{
+.tableTitle {
   font-size: 25px;
   font-weight: bold;
 }
 
-.tableColumns{
-  color:white;
+.tableColumns {
+  color: white;
   font-family: "Eczar SemiBold";
-  opacity:80%;
+  opacity: 80%;
   font-weight: bold;
-  font-size: 17px
+  font-size: 17px;
 }
 
-.tableHead{
-  background-color:#1C1C1C
+.tableHead {
+  background-color: #1c1c1c;
 }
 
-.tableBody{
-  background-color:#1C1C1C;
-  color:white
+.tableBody {
+  background-color: #1c1c1c;
+  color: white;
 }
-
 </style>

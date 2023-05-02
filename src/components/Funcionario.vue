@@ -13,21 +13,20 @@
 
       <v-card-text>
         <v-text-field
-        :loading="loading.searchable"
+          :loading="loading.searchable"
           v-model="text"
           density="compact"
           variant="underlined"
           label="Pesquisar"
           append-inner-icon="mdi-magnify"
           single-line
+          v-model="search"
           clearable
           hide-details
-          @click:clear="loadFuncionários"
+          @click:clear="loadFuncionários;"
           @click:append-inner="searchInput(text)"
-          
         >
-        
-        </v-text-field> 
+        </v-text-field>
       </v-card-text>
 
       <v-btn
@@ -178,7 +177,6 @@
     </v-card>
   </v-dialog>
   <v-snackbar v-model="alert.isActive" :timeout="2000" location="top right">
-
     <!-- <template >
         <v-btn class="ma-2" v-bind="props">open</v-btn>
       </template> -->
@@ -187,62 +185,66 @@
   </v-snackbar>
 </template>
 
-<script lang="ts" >
+<script lang="ts">
 export default {
   mounted() {
-    this.loadFuncionários();
+    this.loadFuncionarios();
   },
   data: () => ({
     nomeRule: [
-        value => {
-          if (value) return true
-         return 'Campo Obrigatório'}
-  ],
-  sobrenomeRule: [
-        value => {
-          if (value) return true
-         return 'Campo Obrigatório'}
-  ],
+      (value) => {
+        if (value) return true;
+        return "Campo Obrigatório";
+      },
+    ],
+    sobrenomeRule: [
+      (value) => {
+        if (value) return true;
+        return "Campo Obrigatório";
+      },
+    ],
 
-  celularRule: [
-        value => {
-          if (value) return true
-         return 'Campo Obrigatório'}
-  ],
+    celularRule: [
+      (value) => {
+        if (value) return true;
+        return "Campo Obrigatório";
+      },
+    ],
 
-  cpfRule: [
-        value => {
-          if (value) return true
-         return 'Campo Obrigatório'}
-  ],
+    cpfRule: [
+      (value) => {
+        if (value) return true;
+        return "Campo Obrigatório";
+      },
+    ],
 
-  enderecoRule: [
-        value => {
-          if (value) return true
-         return 'Campo Obrigatório'}
-  ],
+    enderecoRule: [
+      (value) => {
+        if (value) return true;
+        return "Campo Obrigatório";
+      },
+    ],
 
-  rgRule: [
-        value => {
-          if (value) return true
-         return 'Campo Obrigatório'}
-  ],
+    rgRule: [
+      (value) => {
+        if (value) return true;
+        return "Campo Obrigatório";
+      },
+    ],
 
-  salarioRule: [
-        value => {
-          if (value) return true
-         return 'Campo Obrigatório'}
-  ],
+    salarioRule: [
+      (value) => {
+        if (value) return true;
+        return "Campo Obrigatório";
+      },
+    ],
 
-  setorRule: [
-        value => {
-          if (value) return true
-         return 'Campo Obrigatório'}
-  ],
-
-
-
-
+    setorRule: [
+      (value) => {
+        if (value) return true;
+        return "Campo Obrigatório";
+      },
+    ],
 
     funcionarios: [] as any,
     text: "",
@@ -270,12 +272,11 @@ export default {
   }),
   methods: {
     searchInput(text: string) {
-      console.log(text)
-      if(text.length == 0 || text == null){
+      console.log(text);
+      if (text.length == 0 || text == null) {
         this.loadFuncionários();
-      } else{
-        fetch(`http://localhost:3000/v1/funcionario?nome=${text}`
-        )
+      } else {
+        fetch(`http://localhost:3000/v1/funcionario?nome=${text}`)
           .then((response) => response.json())
           .then((data) => {
             this.loading.searchable = true;
@@ -286,10 +287,8 @@ export default {
             this.loading.searchable = true;
           });
       }
-      
-        
-        //this.loading.searchable = true;
-        
+
+      //this.loading.searchable = true;
     },
     /*
     searchInput(text: string) {
@@ -311,6 +310,7 @@ export default {
     }*/
     loadFuncionários() {
       this.loading.searchable = false;
+      this.search = "";
       // this.funcionários = [
       //   {
       //     id: 1,
@@ -338,62 +338,63 @@ export default {
 
     // },
     submit() {
-      if(this.funcionarioDialog.celular &&
-       this.funcionarioDialog.cpf &&
-       this.funcionarioDialog.endereco &&
-       this.funcionarioDialog.nome &&
-       this.funcionarioDialog.rg &&
-       this.funcionarioDialog.salario &&
-       this.funcionarioDialog.setor &&
-       this.funcionarioDialog.sobrenome 
-       ){
+      if (
+        this.funcionarioDialog.celular &&
+        this.funcionarioDialog.cpf &&
+        this.funcionarioDialog.endereco &&
+        this.funcionarioDialog.nome &&
+        this.funcionarioDialog.rg &&
+        this.funcionarioDialog.salario &&
+        this.funcionarioDialog.setor &&
+        this.funcionarioDialog.sobrenome
+      ) {
         this.loading.creating = true;
-      const url =
-        "http://localhost:3000/v1/funcionario" +
-        (this.funcionarioDialog.id ? "/" + this.funcionarioDialog.id : "");
-      const method = this.funcionarioDialog.id ? "PUT" : "POST";
-      fetch(url, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          nome: this.funcionarioDialog.nome,
-          sobrenome: this.funcionarioDialog.sobrenome,
-          celular: this.funcionarioDialog.celular,
-          cpf: this.funcionarioDialog.cpf,
-          endereco: this.funcionarioDialog.endereco,
-          rg: this.funcionarioDialog.rg,
-          salario: this.funcionarioDialog.salario,
-          setor: this.funcionarioDialog.setor,
-        }),
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          console.log("Success:", data);
-          this.alert.message = "Funcionário salvo com sucesso!";
-          this.alert.isActive = true;
+        const url =
+          "http://localhost:3000/v1/funcionario" +
+          (this.funcionarioDialog.id ? "/" + this.funcionarioDialog.id : "");
+        const method = this.funcionarioDialog.id ? "PUT" : "POST";
+        fetch(url, {
+          method,
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            nome: this.funcionarioDialog.nome,
+            sobrenome: this.funcionarioDialog.sobrenome,
+            celular: this.funcionarioDialog.celular,
+            cpf: this.funcionarioDialog.cpf,
+            endereco: this.funcionarioDialog.endereco,
+            rg: this.funcionarioDialog.rg,
+            salario: this.funcionarioDialog.salario,
+            setor: this.funcionarioDialog.setor,
+          }),
         })
-        .catch((error) => {
-          this.alert.message = "Erro ao salvar funcionário! Tente novamente.";
-          this.alert.isActive = true;
-        })
-        .finally(() => {
-          this.loading.creating = false;
-          this.dialogCreate = false;
-          this.funcionarioDialog = {
-            id: null,
-            nome: "",
-            sobrenome: "",
-            celular: "",
-            cpf: "",
-            endereco: "",
-            rg: "",
-            salario: null,
-            setor: "",
-          };
-          this.loadFuncionários();
-        });
+          .then((response) => response.json())
+          .then((data) => {
+            console.log("Success:", data);
+            this.alert.message = "Funcionário salvo com sucesso!";
+            this.alert.isActive = true;
+          })
+          .catch((error) => {
+            this.alert.message = "Erro ao salvar funcionário! Tente novamente.";
+            this.alert.isActive = true;
+          })
+          .finally(() => {
+            this.loading.creating = false;
+            this.dialogCreate = false;
+            this.funcionarioDialog = {
+              id: null,
+              nome: "",
+              sobrenome: "",
+              celular: "",
+              cpf: "",
+              endereco: "",
+              rg: "",
+              salario: null,
+              setor: "",
+            };
+            this.loadFuncionarios();
+          });
       }
     },
     deleteClient(funcionarioId: string) {
@@ -413,7 +414,7 @@ export default {
         })
         .finally(() => {
           this.loading.tableData = false;
-          this.loadFuncionários();
+          this.loadFuncionarios();
         });
     },
     openEditDialog(funcionarioInfo: any) {
@@ -425,33 +426,32 @@ export default {
 </script>
 
 <style scoped>
-.table{
-  background-color:#434342; 
+.table {
+  background-color: #434342;
   background-size: cover;
   font-family: "Eczar SemiBold";
-  color:white;
+  color: white;
 }
 
-.tableTitle{
+.tableTitle {
   font-size: 25px;
   font-weight: bold;
 }
 
-.tableColumns{
-  color:white;
+.tableColumns {
+  color: white;
   font-family: "Eczar SemiBold";
-  opacity:80%;
+  opacity: 80%;
   font-weight: bold;
-  font-size: 17px
+  font-size: 17px;
 }
 
-.tableHead{
-  background-color:#1C1C1C
+.tableHead {
+  background-color: #1c1c1c;
 }
 
-.tableBody{
-  background-color:#1C1C1C;
-  color:white
+.tableBody {
+  background-color: #1c1c1c;
+  color: white;
 }
-
 </style>
