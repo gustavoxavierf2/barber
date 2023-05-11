@@ -205,15 +205,23 @@ export default {
 
     celularRule: [
       (value) => {
-        if (value) return true;
-        return "Campo Obrigatório";
+        if (!value) return "Campo Obrigatório";
+        if (value.length != 11 || !new RegExp(/[0-9]{11}/).test(value))
+          return "Celular inválido";
+        return true;
       },
     ],
 
     cpfRule: [
       (value) => {
-        if (value) return true;
-        return "Campo Obrigatório";
+        if (!value) "Campo Obrigatório";
+        if (
+          value.length < 11 ||
+          value.length > 11 ||
+          !new RegExp(/[0-9]{11}/).test(value)
+        )
+          return "CPF inválido";
+        return true;
       },
     ],
 
@@ -275,7 +283,13 @@ export default {
       if (text.length == 0 || text == null) {
         this.loadFuncionários();
       } else {
-        fetch(`http://localhost:3000/v1/funcionario?nome=${text}`)
+        let url = "http://localhost:3000/v1/funcionario";
+        if (new RegExp(/[0-9]{11}/).test(text)) {
+          url += `?cpf=${this.text}`;
+        } else {
+          url += `?nome=${this.text}`;
+        }
+        fetch(url)
           .then((response) => response.json())
           .then((data) => {
             this.loading.searchable = true;
@@ -283,7 +297,7 @@ export default {
             console.log(data);
           })
           .finally(() => {
-            this.loading.searchable = true;
+            this.loading.searchable = false;
           });
       }
 
@@ -337,6 +351,23 @@ export default {
 
     // },
     submit() {
+      if (
+        this.funcionarioDialog.cpf.length != 11 ||
+        !new RegExp(/[0-9]{11}/).test(this.funcionarioDialog.cpf)
+      ) {
+        this.alert.message = "CPF inválido";
+        this.alert.isActive = true;
+        return;
+      }
+
+      if (
+        this.funcionarioDialog.celular.length != 11 ||
+        !new RegExp(/[0-9]{11}/).test(this.funcionarioDialog.celular)
+      ) {
+        this.alert.message = "Celular inválido";
+        this.alert.isActive = true;
+        return;
+      }
       if (
         this.funcionarioDialog.celular &&
         this.funcionarioDialog.cpf &&

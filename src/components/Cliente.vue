@@ -151,9 +151,9 @@ export default {
     ],
     celularRule: [
       (value) => {
-        if (value) return true;
-
-        return "Campo Obrigatório";
+        if (!value) return "Campo Obrigatório";
+        if (value.length < 11 || value.length > 11) return "Celular inválido";
+        return true;
       },
     ],
     clientes: [] as any,
@@ -224,6 +224,14 @@ export default {
 
     // },
     submit() {
+      if (
+        this.clientDialog.celular.length < 11 ||
+        this.clientDialog.celular.length > 11
+      ) {
+        this.alert.message = "Celular inválido";
+        this.alert.isActive = true;
+        return;
+      }
       if (
         this.clientDialog.nome &&
         this.clientDialog.sobrenome &&
