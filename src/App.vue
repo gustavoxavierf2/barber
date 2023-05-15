@@ -106,6 +106,10 @@ export default {
         title: "Servico",
         link: "/Servico",
       },
+      {
+        title: "Fornecedor",
+        link: "/Fornecedor"
+      },
 
       {
         title: "Agendamento",

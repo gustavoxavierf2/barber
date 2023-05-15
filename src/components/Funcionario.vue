@@ -187,7 +187,7 @@
 <script lang="ts">
 export default {
   mounted() {
-    this.loadFuncionários();
+    this.loadFuncionarios();
   },
   data: () => ({
     nomeRule: [
@@ -281,7 +281,7 @@ export default {
     searchInput(text: string) {
       console.log(text);
       if (text.length == 0 || text == null) {
-        this.loadFuncionários();
+        this.loadFuncionarios();
       } else {
         let url = "http://localhost:3000/v1/funcionario";
         if (new RegExp(/[0-9]{11}/).test(text)) {
@@ -443,7 +443,7 @@ export default {
         })
         .finally(() => {
           this.loading.tableData = false;
-          this.loadFuncionários();
+          this.loadFuncionarios();
         });
     },
     openEditDialog(funcionarioInfo: any) {
