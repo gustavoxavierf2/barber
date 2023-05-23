@@ -108,17 +108,22 @@
           <v-row>
             <v-col cols="12" md="5">
               <v-select
+                  v-model="select"
                   label="Fornecedor"
                   :items="Fornecedores"
+                  item-title="Empresa"
+                  item-value="Descricao"
+                  DescricaoFornecedor="Descricao"
                   :rules="[value => !!value || 'Campo Obrigatório']"
                   variant="outlined"
+                  return-object
                 ></v-select>
             </v-col>
             <v-col cols="12" md="7">
                 <v-textarea
                   counter
-                  label="Descrição do Fornecedor"
-                  :model-value="DescricaoFornecedor"
+                  label="Descrição Fornecedor"
+                  :model-value="select.Descricao"
                   rows="2"
                   ></v-textarea>
             </v-col>
@@ -178,8 +183,29 @@ export default {
     this.loadProduto();
   },
   data: () => ({
-    DescricaoFornecedor: 'Descricao do fornecedor',
-    Fornecedores: ['Fornecedor 1', 'Fornecedor 2', 'Fornecedor 3'],
+    select: {id: '0',
+        Empresa: 'Fornecedor 1',
+        CNPJ: '',
+        Endereco: '',
+        Descricao: 'Fornecedor de alguma coisa',
+        Telefone: '',
+        Email: "",},
+    DescricaoFornecedor: '',
+    Fornecedores: [{id: '0',
+        Empresa: 'Fornecedor 1',
+        CNPJ: '',
+        Endereco: '',
+        Descricao: 'Fornecedor de Outra coisa',
+        Telefone: '',
+        Email: "",},
+        {id: '1',
+        Empresa: 'Fornecedor 2',
+        CNPJ: '',
+        Endereco: '',
+        Descricao: 'Fornecedor de Outra coisa',
+        Telefone: '',
+        Email: "",}
+      ],
     Produto: [{id: '0',
         Nome: '',
         Fornecedor: '',
