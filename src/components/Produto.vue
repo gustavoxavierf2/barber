@@ -8,7 +8,7 @@
     class="mx-auto mt-5"
   >
     <v-toolbar density="compact" class="table">
-      <v-toolbar-title class="tableTitle">Fornecedor</v-toolbar-title> <!-- Titulo do Tabela -->
+      <v-toolbar-title class="tableTitle">Produto</v-toolbar-title> <!-- Titulo do Tabela -->
 
       <v-spacer></v-spacer>
 
@@ -24,7 +24,7 @@
           single-line
           clearable
           hide-details
-          @click:clear="loadFornecedor()"
+          @click:clear="loadProduto()"
           @click:append-inner="searchInput(text)"
         ></v-text-field>
 
@@ -45,23 +45,26 @@
     <v-table class="contentTable">
       <thead class="tableHead">
         <tr>
-          <th class="text-left"><div class="tableColumns">Empresa</div></th>
-          <th class="text-left"><div class="tableColumns">CNPJ</div></th>
-          <th class="text-left"><div class="tableColumns">Endereço</div></th>
-          <th class="text-left"><div class="tableColumns">Descrição</div></th>
-          <th class="text-left"><div class="tableColumns">Telefone</div></th>
-          <th class="text-left"><div class="tableColumns">Email</div></th>
+          <th class="text-left"><div class="tableColumns">Nome</div></th>
+          <th class="text-left"><div class="tableColumns">Fornecedor</div></th>
+          <th class="text-left"><div class="tableColumns">Volume</div></th>
+          <th class="text-left"><div class="tableColumns">Un. Medida</div></th>
+          <th class="text-left"><div class="tableColumns">Valor</div></th>
           <th class="text-left"><div class="tableColumns">Ação</div></th>
         </tr>
       </thead>
       <tbody class="tableBody">
-        <tr v-for="item in Fornecedor" :key="item.id">
-          <td>{{ item.Empresa }}</td>
-          <td>{{ item.CNPJ }}</td>
-          <td>{{ item.Endereco }}</td>
-          <td>{{ item.Descricao }}</td>
-          <td>{{ item.Telefone }}</td>
-          <td>{{ item.Email }}</td>
+        <tr v-for="item in Produto" :key="item.id">
+          <td>{{ item.Nome }}</td>
+          <td>{{ item.Fornecedor }}</td>
+          <td>{{ item.Volume }}</td>
+          <td>{{ item.UnMedida }}</td>
+          <td> {{
+              new Intl.NumberFormat("pt-BR", {
+                style: "currency",
+                currency: "BRL",
+              }).format(Number(item.Valor))
+            }}</td>
           <td>
             <v-btn
               icon
@@ -76,7 +79,7 @@
               icon
               variant="text"
               density="compact"
-              @click="deleteFornecedor(item.id)"
+              @click="deleteProduto(item.id)"
             >
               <v-icon>mdi-delete-outline</v-icon>
               <v-tooltip activator="parent" location="bottom"
@@ -96,57 +99,61 @@
             <v-col cols="12">
               <v-text-field
                 class="textField" 
-                v-model="fornecedorDialog.empresa"
-                label="Empresa"
+                v-model="produtoDialog.nome"
+                label="Nome"
                 :rules="[value => !!value || 'Campo Obrigatório']"
               ></v-text-field>
             </v-col>
           </v-row>
           <v-row>
-            <v-col cols="12" md="6">
+            <v-col cols="12" md="5">
+              <v-select
+                  label="Fornecedor"
+                  :items="Fornecedores"
+                  :rules="[value => !!value || 'Campo Obrigatório']"
+                  variant="outlined"
+                ></v-select>
+            </v-col>
+            <v-col cols="12" md="7">
+                <v-textarea
+                  counter
+                  label="Descrição do Fornecedor"
+                  :model-value="DescricaoFornecedor"
+                  rows="2"
+                  ></v-textarea>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col cols="12" md="4">
               <v-text-field
                 class="textField" 
-                v-model="fornecedorDialog.cnpj"
-                label="CNPJ"
+                v-model="produtoDialog.volume"
+                label="Volume"
                 :rules="[value => !!value || 'Campo Obrigatório']"
               ></v-text-field>
             </v-col>
-            <v-col cols="12" md="6">
+            <v-col cols="12" md="4">
               <v-text-field
                 class="textField" 
-                v-model="fornecedorDialog.endereco"
-                label="Endereço"
+                v-model="produtoDialog.unMedida"
+                label="Unidade De Medida"
+                :rules="[value => !!value || 'Campo Obrigatório']"
+              ></v-text-field>
+            </v-col>
+            <v-col cols="12" md="4">
+              <v-text-field
+                class="textField" 
+                v-model="produtoDialog.valor"
+                prefix="R$"
+                type="number"
+                step="0.01"
+                label="Valor"
+
                 :rules="[value => !!value || 'Campo Obrigatório']"
               ></v-text-field>
             </v-col>
           </v-row>
           <v-row>
-            <v-col cols="12">
-              <v-text-field
-                class="textField" 
-                v-model="fornecedorDialog.linha"
-                label="Linha de Produtos"
-                :rules="[value => !!value || 'Campo Obrigatório']"
-              ></v-text-field>
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col cols="12" md="6">
-              <v-text-field
-                class="textField" 
-                v-model="fornecedorDialog.telefone"
-                label="Telefone"
-                :rules="[value => !!value || 'Campo Obrigatório']"
-              ></v-text-field>
-            </v-col>
-            <v-col cols="12" md="6">
-              <v-text-field
-                class="textField" 
-                v-model="fornecedorDialog.email"
-                label="Email"
-                :rules="[value => !!value || 'Campo Obrigatório']"
-              ></v-text-field>
-            </v-col>
           </v-row>
           <v-row>
             <v-col cols="12" md="4" mx="auto">
@@ -168,54 +175,17 @@
 <script lang="ts">
 export default {
   mounted() {
-    this.loadFornecedor();
+    this.loadProduto();
   },
   data: () => ({
-    /*
-    EmpresaRule: [
-      (value) => {
-        if (value) return true;
-        return "Campo Obrigatório";
-      },
-    ],
-    CNPJRule: [
-      (value) => {
-        if (value) return true;
-        return "Campo Obrigatório";
-      },
-    ],
-    EnderecoRule: [
-      (value) => {
-        if (value) return true;
-        return "Campo Obrigatório";
-      },
-    ],
-    Descricao: [
-      (value) => {
-        if (value) return true;
-        return "Campo Obrigatório";
-      },
-    ],
-    TelefoneRule: [
-      (value) => {
-        if (value) return true;
-        return "Campo Obrigatório";
-      },
-    ],
-    EmailRule: [
-      (value) => {
-        if (value) return true;
-        return "Campo Obrigatório";
-      },
-    ],
-    */
-    Fornecedor: [{id: '0',
-        Empresa: '',
-        CNPJ: '',
-        Endereco: '',
-        Descricao: '',
-        Telefone: '',
-        Email: "",
+    DescricaoFornecedor: 'Descricao do fornecedor',
+    Fornecedores: ['Fornecedor 1', 'Fornecedor 2', 'Fornecedor 3'],
+    Produto: [{id: '0',
+        Nome: '',
+        Fornecedor: '',
+        Volume: '',
+        UnMedida: '',
+        Valor: '',
       }],
     text: "",
     loading: {
@@ -224,14 +194,13 @@ export default {
       creating: false,
     },
     dialogCreate: false,
-    fornecedorDialog: {
+    produtoDialog: {
       id: null,
-      empresa: "",
-      cnpj: "",
-      endereco: "",
-      linha: "",
-      telefone: "",
-      email: "",
+      nome: "",
+      fornecedor: "",
+      volume: "",
+      unMedida: "",
+      valor: "",
     },
     alert: {
       message: "",
@@ -242,14 +211,14 @@ export default {
     //Função para pesquisar no backend
     searchInput(text: string) {
       if (text.length == 0 || text == null) {
-        this.loadFornecedor();
+        this.loadProduto();
       } else {
-        fetch(`http://localhost:3000/v1/fornecedor?nome=${text}`)
+        fetch(`http://localhost:3000/v1/produto?nome=${text}`)
           .then((response) => response.json())
           .then((data) => {
             this.loading.searchable = true;
 
-            this.Fornecedor = data;
+            this.Produto = data;
           })
           .finally(() => {
             this.loading.searchable = false;
@@ -257,7 +226,7 @@ export default {
       }
       this.loading.searchable = true;
     },
-    loadFornecedor() {
+    loadProduto() {
       this.loading.searchable = false;
       // this.Fornecedor = [
       //   {
@@ -278,10 +247,10 @@ export default {
       //   },
       // ];
       
-      fetch("http://localhost:3000/v1/fornecedor")
+      fetch("http://localhost:3000/v1/produto")
         .then((response) => response.json())
         .then((data) => {
-          this.Fornecedor = data;
+          this.Produto = data;
         });
         
     },
@@ -289,82 +258,79 @@ export default {
     // },
     submit() {
       if (
-        this.fornecedorDialog.empresa &&
-        this.fornecedorDialog.cnpj &&
-        this.fornecedorDialog.linha &&
-        this.fornecedorDialog.endereco &&
-        this.fornecedorDialog.email &&
-        this.fornecedorDialog.telefone
+        this.produtoDialog.nome &&
+        this.produtoDialog.fornecedor &&
+        this.produtoDialog.volume &&
+        this.produtoDialog.unMedida &&
+        this.produtoDialog.valor
       ) {
         this.loading.creating = true;
         const url =
-          "http://localhost:3000/v1/fornecedor" +
-          (this.fornecedorDialog.id ? "/" + this.fornecedorDialog.id : "");
-        const method = this.fornecedorDialog.id ? "PUT" : "POST";
+          "http://localhost:3000/v1/produto" +
+          (this.produtoDialog.id ? "/" + this.produtoDialog.id : "");
+        const method = this.produtoDialog.id ? "PUT" : "POST";
         fetch(url, {
           method,
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            nome: this.fornecedorDialog.empresa,
-            cnpj: this.fornecedorDialog.cnpj,
-            endereco: this.fornecedorDialog.endereco,
-            linha: this.fornecedorDialog.linha,
-            telefone: this.fornecedorDialog.telefone,
-            email: this.fornecedorDialog.email,
+            nome: this.produtoDialog.nome,
+            cnpj: this.produtoDialog.fornecedor,
+            endereco: this.produtoDialog.volume,
+            linha: this.produtoDialog.unMedida,
+            telefone: this.produtoDialog.valor,
           }),
         })
           .then((response) => response.json())
           .then((data) => {
             console.log("Success:", data);
-            this.alert.message = "Fornecedor salvo com sucesso!";
+            this.alert.message = "Produto salvo com sucesso!";
             this.alert.isActive = true;
           })
           .catch((error) => {
-            this.alert.message = "Erro ao salvar Fornecedor! Tente novamente.";
+            this.alert.message = "Erro ao salvar Produto! Tente novamente.";
             this.alert.isActive = true;
           })
           .finally(() => {
             this.loading.creating = false;
             this.dialogCreate = false;
-            this.fornecedorDialog = {
+            this.produtoDialog = {
               id: null,
-              empresa: "",
-              cnpj: "",
-              endereco: "",
-              linha: "",
-              telefone: "",
-              email: "",
+              nome: "",
+              fornecedor: "",
+              volume: "",
+              unMedida: "",
+              valor: "",
             };
-            this.loadFornecedor();
+            this.loadProduto();
           });
       } else {
         this.dialogCreate = true;
       }
     },
-    deleteFornecedor(fornecedorId: string) {
+    deleteProduto(produtoId: string) {
       this.loading.tableData = true;
-      fetch("http://localhost:3000/v1/fornecedor/" + fornecedorId, {
+      fetch("http://localhost:3000/v1/produto/" + produtoId, {
         method: "DELETE",
       })
         .then((response) => response.json())
         .then((data) => {
-          this.alert.message = "Fornecedor excluído com sucesso!";
+          this.alert.message = "Produto excluído com sucesso!";
           this.alert.isActive = true;
         })
         .catch((error) => {
           console.error("Error:", error);
-          this.alert.message = "Erro ao excluir Fornecedor! Tente novamente.";
+          this.alert.message = "Erro ao excluir Produto! Tente novamente.";
           this.alert.isActive = true;
         })
         .finally(() => {
           this.loading.tableData = false;
-          this.loadFornecedor();
+          this.loadProduto();
         });
     },
-    openEditDialog(fornecedorInfo: any) {
-      this.fornecedorDialog = fornecedorInfo;
+    openEditDialog(produtoInfo: any) {
+      this.produtoDialog = produtoInfo;
       this.dialogCreate = true;
     },
   },

@@ -1,4 +1,5 @@
 <template>
+  <div>
   <v-card
     color="grey-lighten-4"
     flat
@@ -106,7 +107,7 @@
               <v-text-field
                 v-model="funcionarioDialog.nome"
                 label="Nome"
-                :rules="nomeRule"
+                :rules="[value => !!value || 'Campo Obrigatório']"
               ></v-text-field>
             </v-col>
           </v-row>
@@ -115,14 +116,14 @@
               <v-text-field
                 v-model="funcionarioDialog.sobrenome"
                 label="Sobrenome"
-                :rules="sobrenomeRule"
+                :rules="[value => !!value || 'Campo Obrigatório']"
               ></v-text-field>
             </v-col>
             <v-col cols="12" md="6">
               <v-text-field
                 v-model="funcionarioDialog.celular"
                 label="Celular"
-                :rules="celularRule"
+                :rules="[v => ((v || !!(v.length != 11) ) && new RegExp(/[0-9]{11}/).test(v)) ||'Campo Inválido']"
                 :counter="11"
               ></v-text-field>
             </v-col>
@@ -130,13 +131,13 @@
               <v-text-field
                 v-model="funcionarioDialog.cpf"
                 label="CPF"
-                :rules="cpfRule"
+                :rules="[v => ((v.length < 12 && v.length > 10) && new RegExp(/[0-9]{11}/).test(v)) || 'CPF inválido']"
                 :counter="11"
               ></v-text-field>
               <v-text-field
                 v-model="funcionarioDialog.endereco"
                 label="Endereco"
-                :rules="enderecoRule"
+                :rules="[value => !!value || 'Campo Obrigatório']"
                 :counter="11"
               ></v-text-field>
             </v-col>
@@ -144,13 +145,13 @@
               <v-text-field
                 v-model="funcionarioDialog.rg"
                 label="RG"
-                :rules="rgRule"
+                :rules="[value => !!value || 'Campo Obrigatório']"
                 :counter="10"
               ></v-text-field>
               <v-text-field
                 v-model="funcionarioDialog.salario"
                 label="Salário"
-                :rules="salarioRule"
+                :rules="[value => !!value || 'Campo Obrigatório']"
                 type="number"
                 prefix="R$"
                 step="0.01"
@@ -160,7 +161,7 @@
               <v-text-field
                 v-model="funcionarioDialog.setor"
                 label="Setor"
-                :rules="setorRule"
+                :rules="[value => !!value || 'Campo Obrigatório']"
               ></v-text-field>
             </v-col>
           </v-row>
@@ -176,12 +177,9 @@
     </v-card>
   </v-dialog>
   <v-snackbar v-model="alert.isActive" :timeout="2000" location="top right">
-    <!-- <template >
-        <v-btn class="ma-2" v-bind="props">open</v-btn>
-      </template> -->
-
     {{ alert.message }}
   </v-snackbar>
+</div>
 </template>
 
 <script lang="ts">
@@ -190,7 +188,7 @@ export default {
     this.loadFuncionarios();
   },
   data: () => ({
-    nomeRule: [
+    /*nomeRule: [
       (value) => {
         if (value) return true;
         return "Campo Obrigatório";
@@ -202,7 +200,8 @@ export default {
         return "Campo Obrigatório";
       },
     ],
-
+    */
+    /* 
     celularRule: [
       (value) => {
         if (!value) return "Campo Obrigatório";
@@ -211,7 +210,7 @@ export default {
         return true;
       },
     ],
-
+    
     cpfRule: [
       (value) => {
         if (!value) "Campo Obrigatório";
@@ -224,7 +223,8 @@ export default {
         return true;
       },
     ],
-
+    */
+    /*
     enderecoRule: [
       (value) => {
         if (value) return true;
@@ -252,8 +252,21 @@ export default {
         return "Campo Obrigatório";
       },
     ],
-
-    funcionarios: [] as any,
+    */
+    funcionarios: [
+      {
+    id: '0',
+    nome: '',
+    sobrenome: '',
+    celular: '',
+    cpf: '',
+    endereco: '',
+    rg: "",
+    salario: 0,
+    setor: '',
+    created_at: '',
+    updated_at: '',
+  }],
     text: "",
     loading: {
       searchable: false,

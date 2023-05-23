@@ -110,10 +110,14 @@ export default {
         title: "Fornecedor",
         link: "/Fornecedor"
       },
+      {
+        title: "Produto",
+        link: "/Produto"
+      },
 
       {
         title: "Agendamento",
-        link: "/Cliente",
+        link: "/Agendamento",
       },
     ],
 

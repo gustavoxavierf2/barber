@@ -1,4 +1,5 @@
 <template>
+<div>  
   <v-card
     color="grey-lighten-4"
     flat
@@ -96,7 +97,7 @@
               <v-text-field
                 v-model="servicoDialog.nome"
                 label="Nome"
-                :rules="nomeRule"
+                :rules="[value => !!value || 'Campo Obrigatório']"
               ></v-text-field>
             </v-col>
           </v-row>
@@ -105,14 +106,14 @@
               <v-text-field
                 v-model="servicoDialog.descricao"
                 label="Descricao"
-                :rules="descricaoRule"
+                :rules="[value => !!value || 'Campo Obrigatório']"
               ></v-text-field>
             </v-col>
             <v-col cols="12" md="6">
               <v-text-field
                 v-model="servicoDialog.valor"
                 label="Valor"
-                :rules="valorRule"
+                :rules="[value => !!value || 'Campo Obrigatório']"
                 prefix="R$"
                 type="number"
                 step="0.01"
@@ -133,6 +134,7 @@
   <v-snackbar v-model="alert.isActive" :timeout="2000" location="top right">
     {{ alert.message }}
   </v-snackbar>
+</div>
 </template>
 
 <script lang="ts">
@@ -141,6 +143,7 @@ export default {
     this.loadServicos();
   },
   data: () => ({
+    /*
     nomeRule: [
       (value) => {
         if (value) return true;
@@ -159,8 +162,13 @@ export default {
         return "Campo Obrigatório";
       },
     ],
-
-    servicos: [] as any,
+    */
+    servicos: [{
+        id: "0",
+        nome: '',
+        valor: 0,
+        descricao: ''
+        }],
     text: "",
     loading: {
       searchable: false,
@@ -296,6 +304,7 @@ export default {
     openEditDialog(servicoInfo: any) {
       this.servicoDialog = servicoInfo;
       this.dialogCreate = true;
+      
     },
   },
 };

@@ -1,4 +1,5 @@
 <template>
+  <div>
   <v-card
     color="grey-lighten-4"
     flat
@@ -10,10 +11,10 @@
       <v-toolbar-title class="tableTitle">Cliente</v-toolbar-title>
 
       <v-spacer></v-spacer>
-
+      <!--:loading="loading.searchable" -->
       <v-card-text>
         <v-text-field
-          :loading="loading.searchable"
+          
           v-model="text"
           density="compact"
           variant="underlined"
@@ -81,14 +82,14 @@
   </v-card>
   <v-dialog v-model="dialogCreate">
     <v-card class="w-50 mx-auto mt-12 table">
-      <v-form class="w-100" fast-fail @submit.prevent>
+      <v-form class="w-100" @submit.prevent>
         <v-container>
           <v-row>
             <v-col cols="12">
               <v-text-field
                 v-model="clientDialog.nome"
                 label="Nome"
-                :rules="nomeRule"
+                :rules="[value => !!value || 'Campo Obrigatório']"
               ></v-text-field>
             </v-col>
           </v-row>
@@ -97,14 +98,14 @@
               <v-text-field
                 v-model="clientDialog.sobrenome"
                 label="Sobrenome"
-                :rules="sobrenomeRule"
+                :rules="[value => !!value || 'Campo Obrigatório']"
               ></v-text-field>
             </v-col>
             <v-col cols="12" md="6">
               <v-text-field
                 v-model="clientDialog.celular"
                 label="Celular"
-                :rules="celularRule"
+                :rules="[value => !!value || 'Campo Obrigatório']"
                 :counter="11"
               ></v-text-field>
             </v-col>
@@ -121,26 +122,24 @@
     </v-card>
   </v-dialog>
   <v-snackbar v-model="alert.isActive" :timeout="2000" location="top right">
-    <!-- <template >
-        <v-btn class="ma-2" v-bind="props">open</v-btn>
-      </template> -->
-
     {{ alert.message }}
   </v-snackbar>
+</div>
 </template>
 
-<script lang="ts">
+<script  lang="ts">
+import { maxValue } from '@vuelidate/validators';
+
 export default {
   mounted() {
     this.loadClientes();
   },
   data: () => ({
-    nomeRule: [
+    /*nomeRule:[
       (value) => {
         if (value) return true;
-
         return "Campo Obrigatório";
-      },
+      ,
     ],
     sobrenomeRule: [
       (value) => {
@@ -156,7 +155,15 @@ export default {
         return true;
       },
     ],
-    clientes: [] as any,
+    */
+    clientes: [
+      {id: "0",
+      nome: "",
+      sobrenome: "",
+      celular: "",
+      created_at: "",
+      updated_at: "" }
+    ],
     text: "",
     loading: {
       searchable: false,
@@ -185,35 +192,17 @@ export default {
         fetch(`http://localhost:3000/v1/client?nome=${text}`)
           .then((response) => response.json())
           .then((data) => {
-            this.loading.searchable = true;
+            //this.loading.searchable = true;
             this.clientes = data;
           })
           .finally(() => {
-            this.loading.searchable = true;
+            //this.loading.searchable = true;
           });
       }
       //this.loading.searchable = true;
     },
     loadClientes() {
-      this.loading.searchable = false;
-      // this.clientes = [
-      //   {
-      //     id: 1,
-      //     nome: "nome_1",
-      //     sobrenome: "sobrenome_1",
-      //     celular: "10000000000",
-      //     created_at: "2023-04-16T12:22:37.534Z",
-      //     updated_at: "2023-04-16T12:30:40.374Z",
-      //   },
-      //   {
-      //     id: 2,
-      //     nome: "Teste_1",
-      //     sobrenome: "Teste",
-      //     celular: "10000000001",
-      //     created_at: "2023-04-16T14:55:44.864Z",
-      //     updated_at: "2023-04-16T14:55:44.864Z",
-      //   },
-      // ];
+      //this.loading.searchable = false;
       fetch("http://localhost:3000/v1/client")
         .then((response) => response.json())
         .then((data) => {
@@ -236,7 +225,7 @@ export default {
         this.clientDialog.sobrenome &&
         this.clientDialog.celular
       ) {
-        this.loading.creating = true;
+        //this.loading.creating = true;
         const url =
           "http://localhost:3000/v1/client" +
           (this.clientDialog.id ? "/" + this.clientDialog.id : "");
@@ -263,7 +252,7 @@ export default {
             this.alert.isActive = true;
           })
           .finally(() => {
-            this.loading.creating = false;
+            //this.loading.creating = false;
             this.dialogCreate = false;
             this.clientDialog = {
               id: null,
@@ -276,7 +265,7 @@ export default {
       }
     },
     deleteClient(clientId: string) {
-      this.loading.tableData = true;
+      //this.loading.tableData = true;
       fetch("http://localhost:3000/v1/client/" + clientId, {
         method: "DELETE",
       })
@@ -291,7 +280,7 @@ export default {
           this.alert.isActive = true;
         })
         .finally(() => {
-          this.loading.tableData = false;
+          //this.loading.tableData = false;
           this.loadClientes();
         });
     },
