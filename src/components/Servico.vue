@@ -73,10 +73,11 @@
               <v-tooltip activator="parent" location="bottom">Editar</v-tooltip>
             </v-btn>
             <v-btn
+              v-model="exclusionId"
               icon
               variant="text"
               density="compact"
-              @click="deleteClient(item.id)"
+              @click="openConfirmExclusion(item.id)"
             >
               <v-icon>mdi-delete-outline</v-icon>
               <v-tooltip activator="parent" location="bottom"
@@ -131,38 +132,44 @@
       </v-form>
     </v-card>
   </v-dialog>
+  <v-dialog v-model="dialogExclusion" style="width: 100vh;" d-flex justify-center persistent >
+    <v-card class="table">
+        <v-card-title class="text-h5 ">
+          <div class="table">Cadastro de Serviço</div>
+          
+        </v-card-title>
+        <v-card-text>Deseja confirmar a exclusão do cadastro selecionado?</v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            color="green-darken-1"
+            variant="text"
+            @click="dialogExclusion = false"
+          >
+            Cancelar
+          </v-btn>
+          <v-btn
+            color="red-darken-1"
+            variant="text"
+            @click="deleteClient(exclusionId)"
+          >
+            Confirmar
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+  </v-dialog>
   <v-snackbar v-model="alert.isActive" :timeout="2000" location="top right">
     {{ alert.message }}
   </v-snackbar>
 </div>
 </template>
 
-<script lang="ts">
+<script  lang="ts">
 export default {
   mounted() {
     this.loadServicos();
   },
   data: () => ({
-    /*
-    nomeRule: [
-      (value) => {
-        if (value) return true;
-        return "Campo Obrigatório";
-      },
-    ],
-    descricaoRule: [
-      (value) => {
-        if (value) return true;
-        return "Campo Obrigatório";
-      },
-    ],
-    valorRule: [
-      (value) => {
-        if (value) return true;
-        return "Campo Obrigatório";
-      },
-    ],
-    */
     servicos: [{
         id: "0",
         nome: '',
@@ -175,7 +182,12 @@ export default {
       tableData: false,
       creating: false,
     },
+
     dialogCreate: false,
+    dialogExclusion: false,
+    confirmExclusion:false,
+    exclusionId: '',
+
     servicoDialog: {
       id: null,
       nome: "",
@@ -299,13 +311,17 @@ export default {
         .finally(() => {
           this.loading.tableData = false;
           this.loadServicos();
+          this.dialogExclusion = false;
         });
     },
     openEditDialog(servicoInfo: any) {
       this.servicoDialog = servicoInfo;
-      this.dialogCreate = true;
-      
+      this.dialogCreate = true; 
     },
+    openConfirmExclusion(servicoId: string){
+      this.exclusionId = servicoId;
+      this.dialogExclusion = true;
+    }
   },
 };
 </script>

@@ -56,12 +56,12 @@
       </thead>
       <tbody class="tableBody">
         <tr v-for="item in Fornecedor" :key="item.id">
-          <td>{{ item.Empresa }}</td>
-          <td>{{ item.CNPJ }}</td>
-          <td>{{ item.Endereco }}</td>
-          <td>{{ item.Descricao }}</td>
-          <td>{{ item.Telefone }}</td>
-          <td>{{ item.Email }}</td>
+          <td>{{ item.empresa }}</td>
+          <td>{{ item.cnpj }}</td>
+          <td>{{ item.endereco }}</td>
+          <td>{{ item.descricao }}</td>
+          <td>{{ item.telefone }}</td>
+          <td>{{ item.email }}</td>
           <td>
             <v-btn
               icon
@@ -76,7 +76,7 @@
               icon
               variant="text"
               density="compact"
-              @click="deleteFornecedor(item.id)"
+              @click="openConfirmExclusion(item.id)"
             >
               <v-icon>mdi-delete-outline</v-icon>
               <v-tooltip activator="parent" location="bottom"
@@ -159,63 +159,51 @@
       </v-form>
     </v-card>
   </v-dialog>
+  <v-dialog v-model="dialogExclusion" style="width: 100vh;" d-flex justify-center persistent >
+    <v-card class="table">
+        <v-card-title class="text-h5 ">
+          <div class="table">Cadastro de Fornecedor</div>
+          
+        </v-card-title>
+        <v-card-text>Deseja confirmar a exclusão do cadastro selecionado?</v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            color="green-darken-1"
+            variant="text"
+            @click="dialogExclusion = false"
+          >
+            Cancelar
+          </v-btn>
+          <v-btn
+            color="red-darken-1"
+            variant="text"
+            @click="deleteFornecedor(exclusionId)"
+          >
+            Confirmar
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+  </v-dialog>
   <v-snackbar v-model="alert.isActive" :timeout="2000" location="top right">
     {{ alert.message }}
   </v-snackbar>
 </div>
 </template>
 
-<script lang="ts">
+<script  lang="ts">
 export default {
   mounted() {
     this.loadFornecedor();
   },
   data: () => ({
-    /*
-    EmpresaRule: [
-      (value) => {
-        if (value) return true;
-        return "Campo Obrigatório";
-      },
-    ],
-    CNPJRule: [
-      (value) => {
-        if (value) return true;
-        return "Campo Obrigatório";
-      },
-    ],
-    EnderecoRule: [
-      (value) => {
-        if (value) return true;
-        return "Campo Obrigatório";
-      },
-    ],
-    Descricao: [
-      (value) => {
-        if (value) return true;
-        return "Campo Obrigatório";
-      },
-    ],
-    TelefoneRule: [
-      (value) => {
-        if (value) return true;
-        return "Campo Obrigatório";
-      },
-    ],
-    EmailRule: [
-      (value) => {
-        if (value) return true;
-        return "Campo Obrigatório";
-      },
-    ],
-    */
     Fornecedor: [{id: '0',
-        Empresa: '',
-        CNPJ: '',
-        Endereco: '',
-        Descricao: '',
-        Telefone: '',
-        Email: "",
+        empresa: '',
+        cnpj: '',
+        endereco: '',
+        descricao: '',
+        telefone: '',
+        email: "",
       }],
     text: "",
     loading: {
@@ -224,6 +212,9 @@ export default {
       creating: false,
     },
     dialogCreate: false,
+    dialogExclusion: false,
+    confirmExclusion:false,
+    exclusionId: '',
     fornecedorDialog: {
       id: null,
       empresa: "",
@@ -259,34 +250,16 @@ export default {
     },
     loadFornecedor() {
       this.loading.searchable = false;
-      // this.Fornecedor = [
-      //   {
-      //     id: 1,
-      //     nome: "nome_1",
-      //     sobrenome: "sobrenome_1",
-      //     celular: "10000000000",
-      //     created_at: "2023-04-16T12:22:37.534Z",
-      //     updated_at: "2023-04-16T12:30:40.374Z",
-      //   },
-      //   {
-      //     id: 2,
-      //     nome: "Teste_1",
-      //     sobrenome: "Teste",
-      //     celular: "10000000001",
-      //     created_at: "2023-04-16T14:55:44.864Z",
-      //     updated_at: "2023-04-16T14:55:44.864Z",
-      //   },
-      // ];
       
       fetch("http://localhost:3000/v1/fornecedor")
         .then((response) => response.json())
         .then((data) => {
+          console.log("Dados Carregados!");
           this.Fornecedor = data;
+          
         });
         
     },
-
-    // },
     submit() {
       if (
         this.fornecedorDialog.empresa &&
@@ -361,12 +334,17 @@ export default {
         .finally(() => {
           this.loading.tableData = false;
           this.loadFornecedor();
+          this.dialogExclusion = false;
         });
     },
     openEditDialog(fornecedorInfo: any) {
       this.fornecedorDialog = fornecedorInfo;
       this.dialogCreate = true;
     },
+    openConfirmExclusion(servicoId: string){
+      this.exclusionId = servicoId;
+      this.dialogExclusion = true;
+    }
   },
 };
 </script>

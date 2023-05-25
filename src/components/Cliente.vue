@@ -68,7 +68,7 @@
               icon
               variant="text"
               density="compact"
-              @click="deleteClient(item.id)"
+              @click="openConfirmExclusion(item.id)"
             >
               <v-icon>mdi-delete-outline</v-icon>
               <v-tooltip activator="parent" location="bottom"
@@ -121,6 +121,32 @@
       </v-form>
     </v-card>
   </v-dialog>
+  <v-dialog v-model="dialogExclusion" style="width: 100vh;" d-flex justify-center persistent >
+    <v-card class="table">
+        <v-card-title class="text-h5 ">
+          <div class="table">Cadastro de Cliente</div>
+          
+        </v-card-title>
+        <v-card-text>Deseja confirmar a exclusão do cadastro selecionado?</v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            color="green-darken-1"
+            variant="text"
+            @click="dialogExclusion = false"
+          >
+            Cancelar
+          </v-btn>
+          <v-btn
+            color="red-darken-1"
+            variant="text"
+            @click="deleteClient(exclusionId)"
+          >
+            Confirmar
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+  </v-dialog>
   <v-snackbar v-model="alert.isActive" :timeout="2000" location="top right">
     {{ alert.message }}
   </v-snackbar>
@@ -135,27 +161,6 @@ export default {
     this.loadClientes();
   },
   data: () => ({
-    /*nomeRule:[
-      (value) => {
-        if (value) return true;
-        return "Campo Obrigatório";
-      ,
-    ],
-    sobrenomeRule: [
-      (value) => {
-        if (value) return true;
-
-        return "Campo Obrigatório";
-      },
-    ],
-    celularRule: [
-      (value) => {
-        if (!value) return "Campo Obrigatório";
-        if (value.length < 11 || value.length > 11) return "Celular inválido";
-        return true;
-      },
-    ],
-    */
     clientes: [
       {id: "0",
       nome: "",
@@ -171,6 +176,9 @@ export default {
       creating: false,
     },
     dialogCreate: false,
+    dialogExclusion: false,
+    confirmExclusion:false,
+    exclusionId: '',
     clientDialog: {
       id: null,
       nome: "",
@@ -184,7 +192,6 @@ export default {
   }),
   methods: {
     searchInput(text: string) {
-      //if (text.length > 3) {
       console.log(text);
       if (text.length == 0 || text == null) {
         this.loadClientes();
@@ -192,17 +199,17 @@ export default {
         fetch(`http://localhost:3000/v1/client?nome=${text}`)
           .then((response) => response.json())
           .then((data) => {
-            //this.loading.searchable = true;
+            this.loading.searchable = true;
             this.clientes = data;
           })
           .finally(() => {
-            //this.loading.searchable = true;
+            this.loading.searchable = true;
           });
       }
-      //this.loading.searchable = true;
+      this.loading.searchable = true;
     },
     loadClientes() {
-      //this.loading.searchable = false;
+      this.loading.searchable = false;
       fetch("http://localhost:3000/v1/client")
         .then((response) => response.json())
         .then((data) => {
@@ -210,7 +217,6 @@ export default {
         });
     },
 
-    // },
     submit() {
       if (
         this.clientDialog.celular.length < 11 ||
@@ -225,7 +231,7 @@ export default {
         this.clientDialog.sobrenome &&
         this.clientDialog.celular
       ) {
-        //this.loading.creating = true;
+        this.loading.creating = true;
         const url =
           "http://localhost:3000/v1/client" +
           (this.clientDialog.id ? "/" + this.clientDialog.id : "");
@@ -252,7 +258,7 @@ export default {
             this.alert.isActive = true;
           })
           .finally(() => {
-            //this.loading.creating = false;
+            this.loading.creating = false;
             this.dialogCreate = false;
             this.clientDialog = {
               id: null,
@@ -265,7 +271,7 @@ export default {
       }
     },
     deleteClient(clientId: string) {
-      //this.loading.tableData = true;
+      this.loading.tableData = true;
       fetch("http://localhost:3000/v1/client/" + clientId, {
         method: "DELETE",
       })
@@ -280,14 +286,19 @@ export default {
           this.alert.isActive = true;
         })
         .finally(() => {
-          //this.loading.tableData = false;
+          this.loading.tableData = false;
           this.loadClientes();
+          this.dialogExclusion = false;
         });
     },
     openEditDialog(clientInfo: any) {
       this.clientDialog = clientInfo;
       this.dialogCreate = true;
     },
+    openConfirmExclusion(servicoId: string){
+      this.exclusionId = servicoId;
+      this.dialogExclusion = true;
+    }
   },
 };
 </script>

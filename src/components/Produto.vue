@@ -56,7 +56,7 @@
       <tbody class="tableBody">
         <tr v-for="item in Produto" :key="item.id">
           <td>{{ item.Nome }}</td>
-          <td>{{ item.Fornecedor }}</td>
+          <td>{{ item.Fornecedor.Empresa }}</td>
           <td>{{ item.Volume }}</td>
           <td>{{ item.UnMedida }}</td>
           <td> {{
@@ -79,7 +79,7 @@
               icon
               variant="text"
               density="compact"
-              @click="deleteProduto(item.id)"
+              @click="openConfirmExclusion(item.id)"
             >
               <v-icon>mdi-delete-outline</v-icon>
               <v-tooltip activator="parent" location="bottom"
@@ -108,7 +108,7 @@
           <v-row>
             <v-col cols="12" md="5">
               <v-select
-                  v-model="select"
+                  v-model="selectFornecedor"
                   label="Fornecedor"
                   :items="Fornecedores"
                   item-title="Empresa"
@@ -123,7 +123,7 @@
                 <v-textarea
                   counter
                   label="Descrição Fornecedor"
-                  :model-value="select.Descricao"
+                  :model-value="selectFornecedor.Descricao"
                   rows="2"
                   ></v-textarea>
             </v-col>
@@ -171,34 +171,63 @@
       </v-form>
     </v-card>
   </v-dialog>
+  <v-dialog v-model="dialogExclusion" style="width: 100vh;" d-flex justify-center persistent >
+    <v-card class="table">
+        <v-card-title class="text-h5 ">
+          <div class="table">Cadastro de Serviço</div>
+          
+        </v-card-title>
+        <v-card-text>Deseja confirmar a exclusão do cadastro selecionado?</v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            color="green-darken-1"
+            variant="text"
+            @click="dialogExclusion = false"
+          >
+            Cancelar
+          </v-btn>
+          <v-btn
+            color="red-darken-1"
+            variant="text"
+            @click="deleteProduto(exclusionId)"
+          >
+            Confirmar
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+  </v-dialog>
   <v-snackbar v-model="alert.isActive" :timeout="2000" location="top right">
     {{ alert.message }}
   </v-snackbar>
 </div>
 </template>
 
-<script lang="ts">
+<script  lang="ts">
 export default {
   mounted() {
     this.loadProduto();
   },
   data: () => ({
-    select: {id: '0',
+    selectFornecedor: {id: '0',
         Empresa: 'Fornecedor 1',
         CNPJ: '',
         Endereco: '',
         Descricao: 'Fornecedor de alguma coisa',
         Telefone: '',
         Email: "",},
+
     DescricaoFornecedor: '',
-    Fornecedores: [{id: '0',
+
+    Fornecedores: [
+      {id: '0',
         Empresa: 'Fornecedor 1',
         CNPJ: '',
         Endereco: '',
-        Descricao: 'Fornecedor de Outra coisa',
+        Descricao: 'Fornecedor de Alguma coisa',
         Telefone: '',
         Email: "",},
-        {id: '1',
+      {id: '1',
         Empresa: 'Fornecedor 2',
         CNPJ: '',
         Endereco: '',
@@ -206,12 +235,21 @@ export default {
         Telefone: '',
         Email: "",}
       ],
-    Produto: [{id: '0',
+
+
+    Produto: [
+      {id: '0',
         Nome: '',
-        Fornecedor: '',
         Volume: '',
         UnMedida: '',
         Valor: '',
+        Fornecedor: {id: '0',
+          Empresa: 'Fornecedor X',
+          CNPJ: '000.000.00/0001-01',
+          Endereco: 'Rua a',
+          Descricao: 'Fornecedor de Outra coisa',
+          Telefone: '77 00000000',
+          Email: "venda@fornecedor.com.br",}
       }],
     text: "",
     loading: {
@@ -219,7 +257,13 @@ export default {
       tableData: false,
       creating: false,
     },
+
+
     dialogCreate: false,
+    dialogExclusion: false,
+    confirmExclusion:false,
+    exclusionId: '',
+
     produtoDialog: {
       id: null,
       nome: "",
@@ -227,6 +271,7 @@ export default {
       volume: "",
       unMedida: "",
       valor: "",
+      fornecedorId: null,
     },
     alert: {
       message: "",
@@ -306,6 +351,7 @@ export default {
             endereco: this.produtoDialog.volume,
             linha: this.produtoDialog.unMedida,
             telefone: this.produtoDialog.valor,
+            fornecedorId: this.selectFornecedor.id
           }),
         })
           .then((response) => response.json())
@@ -328,6 +374,7 @@ export default {
               volume: "",
               unMedida: "",
               valor: "",
+              fornecedorId: null,
             };
             this.loadProduto();
           });
@@ -353,13 +400,18 @@ export default {
         .finally(() => {
           this.loading.tableData = false;
           this.loadProduto();
+          this.dialogExclusion = false;
         });
     },
     openEditDialog(produtoInfo: any) {
       this.produtoDialog = produtoInfo;
       this.dialogCreate = true;
     },
-  },
+    openConfirmExclusion(servicoId: string){
+      this.exclusionId = servicoId;
+      this.dialogExclusion = true;
+    },
+  } 
 };
 </script>
 
