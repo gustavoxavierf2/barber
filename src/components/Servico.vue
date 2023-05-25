@@ -1,4 +1,5 @@
 <template>
+<div>  
   <v-card
     color="grey-lighten-4"
     flat
@@ -72,10 +73,11 @@
               <v-tooltip activator="parent" location="bottom">Editar</v-tooltip>
             </v-btn>
             <v-btn
+              v-model="exclusionId"
               icon
               variant="text"
               density="compact"
-              @click="deleteClient(item.id)"
+              @click="openConfirmExclusion(item.id)"
             >
               <v-icon>mdi-delete-outline</v-icon>
               <v-tooltip activator="parent" location="bottom"
@@ -96,7 +98,7 @@
               <v-text-field
                 v-model="servicoDialog.nome"
                 label="Nome"
-                :rules="nomeRule"
+                :rules="[value => !!value || 'Campo Obrigatório']"
               ></v-text-field>
             </v-col>
           </v-row>
@@ -105,14 +107,14 @@
               <v-text-field
                 v-model="servicoDialog.descricao"
                 label="Descricao"
-                :rules="descricaoRule"
+                :rules="[value => !!value || 'Campo Obrigatório']"
               ></v-text-field>
             </v-col>
             <v-col cols="12" md="6">
               <v-text-field
                 v-model="servicoDialog.valor"
                 label="Valor"
-                :rules="valorRule"
+                :rules="[value => !!value || 'Campo Obrigatório']"
                 prefix="R$"
                 type="number"
                 step="0.01"
@@ -130,44 +132,62 @@
       </v-form>
     </v-card>
   </v-dialog>
+  <v-dialog v-model="dialogExclusion" style="width: 100vh;" d-flex justify-center persistent >
+    <v-card class="table">
+        <v-card-title class="text-h5 ">
+          <div class="table">Cadastro de Serviço</div>
+          
+        </v-card-title>
+        <v-card-text>Deseja confirmar a exclusão do cadastro selecionado?</v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            color="green-darken-1"
+            variant="text"
+            @click="dialogExclusion = false"
+          >
+            Cancelar
+          </v-btn>
+          <v-btn
+            color="red-darken-1"
+            variant="text"
+            @click="deleteClient(exclusionId)"
+          >
+            Confirmar
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+  </v-dialog>
   <v-snackbar v-model="alert.isActive" :timeout="2000" location="top right">
     {{ alert.message }}
   </v-snackbar>
+</div>
 </template>
 
-<script lang="ts">
+<script  lang="ts">
 export default {
   mounted() {
     this.loadServicos();
   },
   data: () => ({
-    nomeRule: [
-      (value) => {
-        if (value) return true;
-        return "Campo Obrigatório";
-      },
-    ],
-    descricaoRule: [
-      (value) => {
-        if (value) return true;
-        return "Campo Obrigatório";
-      },
-    ],
-    valorRule: [
-      (value) => {
-        if (value) return true;
-        return "Campo Obrigatório";
-      },
-    ],
-
-    servicos: [] as any,
+    servicos: [{
+        id: "0",
+        nome: '',
+        valor: 0,
+        descricao: ''
+        }],
     text: "",
     loading: {
       searchable: false,
       tableData: false,
       creating: false,
     },
+
     dialogCreate: false,
+    dialogExclusion: false,
+    confirmExclusion:false,
+    exclusionId: '',
+
     servicoDialog: {
       id: null,
       nome: "",
@@ -200,7 +220,6 @@ export default {
     },
     loadServicos() {
       this.loading.searchable = false;
-      this.search = "";
       // this.servicos = [
       //   {
       //     id: 1,
@@ -292,12 +311,17 @@ export default {
         .finally(() => {
           this.loading.tableData = false;
           this.loadServicos();
+          this.dialogExclusion = false;
         });
     },
     openEditDialog(servicoInfo: any) {
       this.servicoDialog = servicoInfo;
-      this.dialogCreate = true;
+      this.dialogCreate = true; 
     },
+    openConfirmExclusion(servicoId: string){
+      this.exclusionId = servicoId;
+      this.dialogExclusion = true;
+    }
   },
 };
 </script>

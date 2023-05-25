@@ -1,6 +1,6 @@
 <template>
-  <div>
-  <v-card
+<div>
+  <v-card  
     color="grey-lighten-4"
     flat
     rounded="0"
@@ -8,14 +8,15 @@
     class="mx-auto mt-5"
   >
     <v-toolbar density="compact" class="table">
-      <v-toolbar-title class="tableTitle">Cliente</v-toolbar-title>
+      <v-toolbar-title class="tableTitle">Produto</v-toolbar-title> <!-- Titulo do Tabela -->
 
       <v-spacer></v-spacer>
-      <!--:loading="loading.searchable" -->
+
       <v-card-text>
+        <!-- Botao de pesquisa :loading="loading.searchable" -->
         <v-text-field
-          
           v-model="text"
+          
           density="compact"
           variant="underlined"
           label="Pesquisar"
@@ -23,11 +24,12 @@
           single-line
           clearable
           hide-details
-          @click:clear="loadClientes"
+          @click:clear="loadProduto()"
           @click:append-inner="searchInput(text)"
         ></v-text-field>
-      </v-card-text>
 
+      </v-card-text>
+      <!-- Botão de criar -->
       <v-btn
         icon
         @click="
@@ -44,16 +46,25 @@
       <thead class="tableHead">
         <tr>
           <th class="text-left"><div class="tableColumns">Nome</div></th>
-          <th class="text-left"><div class="tableColumns">Sobrenome</div></th>
-          <th class="text-left"><div class="tableColumns">Celular</div></th>
+          <th class="text-left"><div class="tableColumns">Fornecedor</div></th>
+          <th class="text-left"><div class="tableColumns">Volume</div></th>
+          <th class="text-left"><div class="tableColumns">Un. Medida</div></th>
+          <th class="text-left"><div class="tableColumns">Valor</div></th>
           <th class="text-left"><div class="tableColumns">Ação</div></th>
         </tr>
       </thead>
       <tbody class="tableBody">
-        <tr v-for="item in clientes" :key="item.id">
-          <td>{{ item.nome }}</td>
-          <td>{{ item.sobrenome }}</td>
-          <td>{{ item.celular }}</td>
+        <tr v-for="item in Produto" :key="item.id">
+          <td>{{ item.Nome }}</td>
+          <td>{{ item.Fornecedor.Empresa }}</td>
+          <td>{{ item.Volume }}</td>
+          <td>{{ item.UnMedida }}</td>
+          <td> {{
+              new Intl.NumberFormat("pt-BR", {
+                style: "currency",
+                currency: "BRL",
+              }).format(Number(item.Valor))
+            }}</td>
           <td>
             <v-btn
               icon
@@ -87,28 +98,67 @@
           <v-row>
             <v-col cols="12">
               <v-text-field
-                v-model="clientDialog.nome"
+                class="textField" 
+                v-model="produtoDialog.nome"
                 label="Nome"
                 :rules="[value => !!value || 'Campo Obrigatório']"
               ></v-text-field>
             </v-col>
           </v-row>
           <v-row>
-            <v-col cols="12" md="6">
+            <v-col cols="12" md="5">
+              <v-select
+                  v-model="selectFornecedor"
+                  label="Fornecedor"
+                  :items="Fornecedores"
+                  item-title="Empresa"
+                  item-value="Descricao"
+                  DescricaoFornecedor="Descricao"
+                  :rules="[value => !!value || 'Campo Obrigatório']"
+                  variant="outlined"
+                  return-object
+                ></v-select>
+            </v-col>
+            <v-col cols="12" md="7">
+                <v-textarea
+                  counter
+                  label="Descrição Fornecedor"
+                  :model-value="selectFornecedor.Descricao"
+                  rows="2"
+                  ></v-textarea>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col cols="12" md="4">
               <v-text-field
-                v-model="clientDialog.sobrenome"
-                label="Sobrenome"
+                class="textField" 
+                v-model="produtoDialog.volume"
+                label="Volume"
                 :rules="[value => !!value || 'Campo Obrigatório']"
               ></v-text-field>
             </v-col>
-            <v-col cols="12" md="6">
+            <v-col cols="12" md="4">
               <v-text-field
-                v-model="clientDialog.celular"
-                label="Celular"
+                class="textField" 
+                v-model="produtoDialog.unMedida"
+                label="Unidade De Medida"
                 :rules="[value => !!value || 'Campo Obrigatório']"
-                :counter="11"
               ></v-text-field>
             </v-col>
+            <v-col cols="12" md="4">
+              <v-text-field
+                class="textField" 
+                v-model="produtoDialog.valor"
+                prefix="R$"
+                type="number"
+                step="0.01"
+                label="Valor"
+
+                :rules="[value => !!value || 'Campo Obrigatório']"
+              ></v-text-field>
+            </v-col>
+          </v-row>
+          <v-row>
           </v-row>
           <v-row>
             <v-col cols="12" md="4" mx="auto">
@@ -124,7 +174,7 @@
   <v-dialog v-model="dialogExclusion" style="width: 100vh;" d-flex justify-center persistent >
     <v-card class="table">
         <v-card-title class="text-h5 ">
-          <div class="table">Cadastro de Cliente</div>
+          <div class="table">Cadastro de Serviço</div>
           
         </v-card-title>
         <v-card-text>Deseja confirmar a exclusão do cadastro selecionado?</v-card-text>
@@ -140,7 +190,7 @@
           <v-btn
             color="red-darken-1"
             variant="text"
-            @click="deleteClient(exclusionId)"
+            @click="deleteProduto(exclusionId)"
           >
             Confirmar
           </v-btn>
@@ -154,36 +204,74 @@
 </template>
 
 <script  lang="ts">
-import { maxValue } from '@vuelidate/validators';
-
 export default {
   mounted() {
-    this.loadClientes();
+    this.loadProduto();
   },
   data: () => ({
-    clientes: [
-      {id: "0",
-      nome: "",
-      sobrenome: "",
-      celular: "",
-      created_at: "",
-      updated_at: "" }
-    ],
+    selectFornecedor: {id: '0',
+        Empresa: 'Fornecedor 1',
+        CNPJ: '',
+        Endereco: '',
+        Descricao: 'Fornecedor de alguma coisa',
+        Telefone: '',
+        Email: "",},
+
+    DescricaoFornecedor: '',
+
+    Fornecedores: [
+      {id: '0',
+        Empresa: 'Fornecedor 1',
+        CNPJ: '',
+        Endereco: '',
+        Descricao: 'Fornecedor de Alguma coisa',
+        Telefone: '',
+        Email: "",},
+      {id: '1',
+        Empresa: 'Fornecedor 2',
+        CNPJ: '',
+        Endereco: '',
+        Descricao: 'Fornecedor de Outra coisa',
+        Telefone: '',
+        Email: "",}
+      ],
+
+
+    Produto: [
+      {id: '0',
+        Nome: '',
+        Volume: '',
+        UnMedida: '',
+        Valor: '',
+        Fornecedor: {id: '0',
+          Empresa: 'Fornecedor X',
+          CNPJ: '000.000.00/0001-01',
+          Endereco: 'Rua a',
+          Descricao: 'Fornecedor de Outra coisa',
+          Telefone: '77 00000000',
+          Email: "venda@fornecedor.com.br",}
+      }],
     text: "",
     loading: {
       searchable: false,
       tableData: false,
       creating: false,
     },
+
+
     dialogCreate: false,
     dialogExclusion: false,
     confirmExclusion:false,
     exclusionId: '',
-    clientDialog: {
+
+    produtoDialog: {
       id: null,
       nome: "",
-      sobrenome: "",
-      celular: "",
+      fornecedor: "",
+      volume: "",
+      unMedida: "",
+      valor: "",
+      fornecedorId: null,
     },
     alert: {
       message: "",
@@ -191,119 +279,150 @@ export default {
     },
   }),
   methods: {
+    //Função para pesquisar no backend
     searchInput(text: string) {
-      console.log(text);
       if (text.length == 0 || text == null) {
-        this.loadClientes();
+        this.loadProduto();
       } else {
-        fetch(`http://localhost:3000/v1/client?nome=${text}`)
+        fetch(`http://localhost:3000/v1/produto?nome=${text}`)
           .then((response) => response.json())
           .then((data) => {
             this.loading.searchable = true;
-            this.clientes = data;
+
+            this.Produto = data;
           })
           .finally(() => {
-            this.loading.searchable = true;
+            this.loading.searchable = false;
           });
       }
       this.loading.searchable = true;
     },
-    loadClientes() {
+    loadProduto() {
       this.loading.searchable = false;
-      fetch("http://localhost:3000/v1/client")
+      // this.Fornecedor = [
+      //   {
+      //     id: 1,
+      //     nome: "nome_1",
+      //     sobrenome: "sobrenome_1",
+      //     celular: "10000000000",
+      //     created_at: "2023-04-16T12:22:37.534Z",
+      //     updated_at: "2023-04-16T12:30:40.374Z",
+      //   },
+      //   {
+      //     id: 2,
+      //     nome: "Teste_1",
+      //     sobrenome: "Teste",
+      //     celular: "10000000001",
+      //     created_at: "2023-04-16T14:55:44.864Z",
+      //     updated_at: "2023-04-16T14:55:44.864Z",
+      //   },
+      // ];
+      
+      fetch("http://localhost:3000/v1/produto")
         .then((response) => response.json())
         .then((data) => {
-          this.clientes = data;
+          this.Produto = data;
         });
+        
     },
 
+    // },
     submit() {
       if (
-        this.clientDialog.celular.length < 11 ||
-        this.clientDialog.celular.length > 11
-      ) {
-        this.alert.message = "Celular inválido";
-        this.alert.isActive = true;
-        return;
-      }
-      if (
-        this.clientDialog.nome &&
-        this.clientDialog.sobrenome &&
-        this.clientDialog.celular
+        this.produtoDialog.nome &&
+        this.produtoDialog.fornecedor &&
+        this.produtoDialog.volume &&
+        this.produtoDialog.unMedida &&
+        this.produtoDialog.valor
       ) {
         this.loading.creating = true;
         const url =
-          "http://localhost:3000/v1/client" +
-          (this.clientDialog.id ? "/" + this.clientDialog.id : "");
-        const method = this.clientDialog.id ? "PUT" : "POST";
+          "http://localhost:3000/v1/produto" +
+          (this.produtoDialog.id ? "/" + this.produtoDialog.id : "");
+        const method = this.produtoDialog.id ? "PUT" : "POST";
         fetch(url, {
           method,
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            nome: this.clientDialog.nome,
-            sobrenome: this.clientDialog.sobrenome,
-            celular: this.clientDialog.celular,
+            nome: this.produtoDialog.nome,
+            cnpj: this.produtoDialog.fornecedor,
+            endereco: this.produtoDialog.volume,
+            linha: this.produtoDialog.unMedida,
+            telefone: this.produtoDialog.valor,
+            fornecedorId: this.selectFornecedor.id
           }),
         })
           .then((response) => response.json())
           .then((data) => {
             console.log("Success:", data);
-            this.alert.message = "Cliente salvo com sucesso!";
+            this.alert.message = "Produto salvo com sucesso!";
             this.alert.isActive = true;
           })
           .catch((error) => {
-            this.alert.message = "Erro ao salvar cliente! Tente novamente.";
+            this.alert.message = "Erro ao salvar Produto! Tente novamente.";
             this.alert.isActive = true;
           })
           .finally(() => {
             this.loading.creating = false;
             this.dialogCreate = false;
-            this.clientDialog = {
+            this.produtoDialog = {
               id: null,
               nome: "",
-              sobrenome: "",
-              celular: "",
+              fornecedor: "",
+              volume: "",
+              unMedida: "",
+              valor: "",
+              fornecedorId: null,
             };
-            this.loadClientes();
+            this.loadProduto();
           });
+      } else {
+        this.dialogCreate = true;
       }
     },
-    deleteClient(clientId: string) {
+    deleteProduto(produtoId: string) {
       this.loading.tableData = true;
-      fetch("http://localhost:3000/v1/client/" + clientId, {
+      fetch("http://localhost:3000/v1/produto/" + produtoId, {
         method: "DELETE",
       })
         .then((response) => response.json())
         .then((data) => {
-          this.alert.message = "Cliente excluído com sucesso!";
+          this.alert.message = "Produto excluído com sucesso!";
           this.alert.isActive = true;
         })
         .catch((error) => {
           console.error("Error:", error);
-          this.alert.message = "Erro ao excluir cliente! Tente novamente.";
+          this.alert.message = "Erro ao excluir Produto! Tente novamente.";
           this.alert.isActive = true;
         })
         .finally(() => {
           this.loading.tableData = false;
-          this.loadClientes();
+          this.loadProduto();
           this.dialogExclusion = false;
         });
     },
-    openEditDialog(clientInfo: any) {
-      this.clientDialog = clientInfo;
+    openEditDialog(produtoInfo: any) {
+      this.produtoDialog = produtoInfo;
       this.dialogCreate = true;
     },
     openConfirmExclusion(servicoId: string){
       this.exclusionId = servicoId;
       this.dialogExclusion = true;
-    }
-  },
+    },
+  } 
 };
 </script>
 
 <style scoped>
+.textField{
+  background-color:rgb(83, 83, 83); 
+  border-radius: 5px;
+  color:white;
+  
+}
+
 .table {
   background-color: #434342;
   background-size: cover;

@@ -33,6 +33,7 @@
                     <v-btn
                       id="{{i + moduloMenu.title}}"
                       size="large"
+                      
                       v-bind="props"
                       width="400"
                       class="buttonMenu"
@@ -41,6 +42,7 @@
                       <router-link
                         :to="moduloMenu.link"
                         class="w-100 buttonLink"
+                        
                       >
                         {{ moduloMenu.title }}
                       </router-link>
@@ -96,7 +98,7 @@ export default {
       },
 
       {
-        title: "Funcionário",
+        title: "Funcionario",
         link: "/Funcionario",
       },
 
@@ -104,11 +106,19 @@ export default {
         title: "Servico",
         link: "/Servico",
       },
+      {
+        title: "Fornecedor",
+        link: "/Fornecedor"
+      },
+      {
+        title: "Produto",
+        link: "/Produto"
+      },
 
-      // {
-      //   title: "Agendamento",
-      //   link: "/Cliente",
-      // },
+      {
+        title: "Agendamento",
+        link: "/Agendamento",
+      },
     ],
 
     props: {},
@@ -122,6 +132,7 @@ export default {
   font-family: "Eczar SemiBold";
   src: url("./assets/Eczar-VariableFont_wght.ttf");
 }
+
 
 * {
   margin: 0px;
@@ -192,15 +203,15 @@ a {
   width: 100%;
 }
 
-.buttonMenu {
+.buttonMenu{
   font-weight: bold;
-  background-color: #1c1c1c;
+  background-color:#1C1C1C;
 }
-.buttonLink {
+.buttonLink{
   display: flex;
-  width: 100%;
-
-  color: white;
+  width: 100%; 
+   
+  color:white;
   font-family: Eczar SemiBold;
   align-content: center;
 }

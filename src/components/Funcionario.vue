@@ -1,4 +1,5 @@
 <template>
+  <div>
   <v-card
     color="grey-lighten-4"
     flat
@@ -85,7 +86,7 @@
               icon
               variant="text"
               density="compact"
-              @click="deleteClient(item.id)"
+              @click="openConfirmExclusion(item.id)"
             >
               <v-icon>mdi-delete-outline</v-icon>
               <v-tooltip activator="parent" location="bottom"
@@ -106,7 +107,7 @@
               <v-text-field
                 v-model="funcionarioDialog.nome"
                 label="Nome"
-                :rules="nomeRule"
+                :rules="[value => !!value || 'Campo Obrigatório']"
               ></v-text-field>
             </v-col>
           </v-row>
@@ -115,14 +116,14 @@
               <v-text-field
                 v-model="funcionarioDialog.sobrenome"
                 label="Sobrenome"
-                :rules="sobrenomeRule"
+                :rules="[value => !!value || 'Campo Obrigatório']"
               ></v-text-field>
             </v-col>
             <v-col cols="12" md="6">
               <v-text-field
                 v-model="funcionarioDialog.celular"
                 label="Celular"
-                :rules="celularRule"
+                :rules="[v => ((v || !!(v.length != 11) ) && new RegExp(/[0-9]{11}/).test(v)) ||'Campo Inválido']"
                 :counter="11"
               ></v-text-field>
             </v-col>
@@ -130,13 +131,13 @@
               <v-text-field
                 v-model="funcionarioDialog.cpf"
                 label="CPF"
-                :rules="cpfRule"
+                :rules="[v => ((v.length < 12 && v.length > 10) && new RegExp(/[0-9]{11}/).test(v)) || 'CPF inválido']"
                 :counter="11"
               ></v-text-field>
               <v-text-field
                 v-model="funcionarioDialog.endereco"
                 label="Endereco"
-                :rules="enderecoRule"
+                :rules="[value => !!value || 'Campo Obrigatório']"
                 :counter="11"
               ></v-text-field>
             </v-col>
@@ -144,13 +145,13 @@
               <v-text-field
                 v-model="funcionarioDialog.rg"
                 label="RG"
-                :rules="rgRule"
+                :rules="[value => !!value || 'Campo Obrigatório']"
                 :counter="10"
               ></v-text-field>
               <v-text-field
                 v-model="funcionarioDialog.salario"
                 label="Salário"
-                :rules="salarioRule"
+                :rules="[value => !!value || 'Campo Obrigatório']"
                 type="number"
                 prefix="R$"
                 step="0.01"
@@ -160,7 +161,7 @@
               <v-text-field
                 v-model="funcionarioDialog.setor"
                 label="Setor"
-                :rules="setorRule"
+                :rules="[value => !!value || 'Campo Obrigatório']"
               ></v-text-field>
             </v-col>
           </v-row>
@@ -175,85 +176,59 @@
       </v-form>
     </v-card>
   </v-dialog>
-  <v-snackbar v-model="alert.isActive" :timeout="2000" location="top right">
-    <!-- <template >
-        <v-btn class="ma-2" v-bind="props">open</v-btn>
-      </template> -->
+  <v-dialog v-model="dialogExclusion" style="width: 100vh;" d-flex justify-center persistent >
+    <v-card class="table">
+        <v-card-title class="text-h5 ">
+          <div class="table">Cadastro de Funcionário</div>
+          
+        </v-card-title>
+        <v-card-text>Deseja confirmar a exclusão do cadastro selecionado?</v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            color="green-darken-1"
+            variant="text"
+            @click="dialogExclusion = false"
+          >
+            Cancelar
+          </v-btn>
+          <v-btn
+            color="red-darken-1"
+            variant="text"
+            @click="deleteClient(exclusionId)"
+          >
+            Confirmar
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+  </v-dialog>
 
+  <v-snackbar v-model="alert.isActive" :timeout="2000" location="top right">
     {{ alert.message }}
   </v-snackbar>
+</div>
 </template>
 
-<script lang="ts">
+<script  lang="ts">
 export default {
   mounted() {
     this.loadFuncionarios();
   },
   data: () => ({
-    nomeRule: [
-      (value) => {
-        if (value) return true;
-        return "Campo Obrigatório";
-      },
-    ],
-    sobrenomeRule: [
-      (value) => {
-        if (value) return true;
-        return "Campo Obrigatório";
-      },
-    ],
-
-    celularRule: [
-      (value) => {
-        if (!value) return "Campo Obrigatório";
-        if (value.length != 11 || !new RegExp(/[0-9]{11}/).test(value))
-          return "Celular inválido";
-        return true;
-      },
-    ],
-
-    cpfRule: [
-      (value) => {
-        if (!value) "Campo Obrigatório";
-        if (
-          value.length < 11 ||
-          value.length > 11 ||
-          !new RegExp(/[0-9]{11}/).test(value)
-        )
-          return "CPF inválido";
-        return true;
-      },
-    ],
-
-    enderecoRule: [
-      (value) => {
-        if (value) return true;
-        return "Campo Obrigatório";
-      },
-    ],
-
-    rgRule: [
-      (value) => {
-        if (value) return true;
-        return "Campo Obrigatório";
-      },
-    ],
-
-    salarioRule: [
-      (value) => {
-        if (value) return true;
-        return "Campo Obrigatório";
-      },
-    ],
-
-    setorRule: [
-      (value) => {
-        if (value) return true;
-        return "Campo Obrigatório";
-      },
-    ],
-
-    funcionarios: [] as any,
+    funcionarios: [
+      {
+    id: '0',
+    nome: '',
+    sobrenome: '',
+    celular: '',
+    cpf: '',
+    endereco: '',
+    rg: "",
+    salario: 0,
+    setor: '',
+    created_at: '',
+    updated_at: '',
+  }],
     text: "",
     loading: {
       searchable: false,
@@ -261,6 +236,10 @@ export default {
       creating: false,
     },
     dialogCreate: false,
+    dialogExclusion: false,
+    confirmExclusion:false,
+    exclusionId: '',
+
     funcionarioDialog: {
       id: null,
       nome: "",
@@ -281,7 +260,7 @@ export default {
     searchInput(text: string) {
       console.log(text);
       if (text.length == 0 || text == null) {
-        this.loadFuncionários();
+        this.loadFuncionarios();
       } else {
         let url = "http://localhost:3000/v1/funcionario";
         if (new RegExp(/[0-9]{11}/).test(text)) {
@@ -303,53 +282,14 @@ export default {
 
       //this.loading.searchable = true;
     },
-    /*
-    searchInput(text: string) {
-      if (text.length > 3) {
-        console.log(text);
-        this.loading.searchable = true;
-        fetch("http://localhost:3000/v1/funcionario")
-          .then((response) => response.json())
-          .then((data) => {
-            this.loading.searchable = true;
-            this.funcionarios = data;
-          })
-          .finally(() => {
-            this.loading.searchable = true;
-          });
-      } else if (text.length == 0) {
-        this.loadFuncionários();
-      }
-    }*/
     loadFuncionarios() {
       this.loading.searchable = false;
-      this.search = "";
-      // this.funcionários = [
-      //   {
-      //     id: 1,
-      //     nome: "nome_1",
-      //     sobrenome: "sobrenome_1",
-      //     celular: "10000000000",
-      //     created_at: "2023-04-16T12:22:37.534Z",
-      //     updated_at: "2023-04-16T12:30:40.374Z",
-      //   },
-      //   {
-      //     id: 2,
-      //     nome: "Teste_1",
-      //     sobrenome: "Teste",
-      //     celular: "10000000001",
-      //     created_at: "2023-04-16T14:55:44.864Z",
-      //     updated_at: "2023-04-16T14:55:44.864Z",
-      //   },
-      // ];
       fetch("http://localhost:3000/v1/funcionario")
         .then((response) => response.json())
         .then((data) => {
           this.funcionarios = data;
         });
     },
-
-    // },
     submit() {
       if (
         this.funcionarioDialog.cpf.length != 11 ||
@@ -445,12 +385,17 @@ export default {
         .finally(() => {
           this.loading.tableData = false;
           this.loadFuncionarios();
+          this.dialogExclusion = false;
         });
     },
     openEditDialog(funcionarioInfo: any) {
       this.funcionarioDialog = funcionarioInfo;
       this.dialogCreate = true;
     },
+    openConfirmExclusion(servicoId: string){
+      this.exclusionId = servicoId;
+      this.dialogExclusion = true;
+    }
   },
 };
 </script>
