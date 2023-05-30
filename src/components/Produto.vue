@@ -55,15 +55,15 @@
       </thead>
       <tbody class="tableBody">
         <tr v-for="item in Produto" :key="item.id">
-          <td>{{ item.Nome }}</td>
-          <td>{{ item.Fornecedor.Empresa }}</td>
-          <td>{{ item.Volume }}</td>
-          <td>{{ item.UnMedida }}</td>
+          <td>{{ item.nome }}</td>
+          <td>{{ item.fornecedor.empresa }}</td>
+          <td>{{ item.volume }}</td>
+          <td>{{ item.unMedida }}</td>
           <td> {{
               new Intl.NumberFormat("pt-BR", {
                 style: "currency",
                 currency: "BRL",
-              }).format(Number(item.Valor))
+              }).format(Number(item.valor))
             }}</td>
           <td>
             <v-btn
@@ -111,8 +111,8 @@
                   v-model="selectFornecedor"
                   label="Fornecedor"
                   :items="Fornecedores"
-                  item-title="Empresa"
-                  item-value="Descricao"
+                  item-title="empresa"
+                  item-value="descricao"
                   DescricaoFornecedor="Descricao"
                   :rules="[value => !!value || 'Campo Obrigatório']"
                   variant="outlined"
@@ -120,10 +120,24 @@
                 ></v-select>
             </v-col>
             <v-col cols="12" md="7">
+              <!--<v-card
+                class="mx-auto"
+                width="400"
+              >
+                <template v-slot:title>
+                  This is a title
+                </template>
+
+                <v-card-text>
+                  This is content
+                </v-card-text>
+              </v-card>
+              -->
+              
                 <v-textarea
                   counter
                   label="Descrição Fornecedor"
-                  :model-value="selectFornecedor.Descricao"
+                  :model-value="selectFornecedor.descricao"
                   rows="2"
                   ></v-textarea>
             </v-col>
@@ -153,7 +167,6 @@
                 type="number"
                 step="0.01"
                 label="Valor"
-
                 :rules="[value => !!value || 'Campo Obrigatório']"
               ></v-text-field>
             </v-col>
@@ -203,53 +216,54 @@
 </div>
 </template>
 
-<script  lang="ts">
+<script lang="ts">
 export default {
   mounted() {
     this.loadProduto();
+    this.loadFornecedor();
+    //console.log(this.Fornecedores)
   },
   data: () => ({
     selectFornecedor: {id: '0',
-        Empresa: 'Fornecedor 1',
-        CNPJ: '',
-        Endereco: '',
-        Descricao: 'Fornecedor de alguma coisa',
-        Telefone: '',
-        Email: "",},
+        empresa: 'Selecione O Fornecedor',
+        cnpj: '',
+        endereco: '',
+        descricao: '-',
+        telefone: '',
+        email: "",},
 
     DescricaoFornecedor: '',
 
     Fornecedores: [
       {id: '0',
-        Empresa: 'Fornecedor 1',
-        CNPJ: '',
-        Endereco: '',
-        Descricao: 'Fornecedor de Alguma coisa',
-        Telefone: '',
-        Email: "",},
+        empresa: 'Fornecedor 1',
+        cnpj: '',
+        endereco: '',
+        descricao: 'Fornecedor de Alguma coisa',
+        telefone: '',
+        email: "",},
       {id: '1',
-        Empresa: 'Fornecedor 2',
-        CNPJ: '',
-        Endereco: '',
-        Descricao: 'Fornecedor de Outra coisa',
-        Telefone: '',
-        Email: "",}
+        empresa: 'Fornecedor 2',
+        cnpj: '',
+        endereco: '',
+        descricao: 'Fornecedor de Outra coisa',
+        telefone: '',
+        email: "",}
       ],
-
-
+    
     Produto: [
       {id: '0',
-        Nome: '',
-        Volume: '',
-        UnMedida: '',
-        Valor: '',
-        Fornecedor: {id: '0',
-          Empresa: 'Fornecedor X',
-          CNPJ: '000.000.00/0001-01',
-          Endereco: 'Rua a',
-          Descricao: 'Fornecedor de Outra coisa',
-          Telefone: '77 00000000',
-          Email: "venda@fornecedor.com.br",}
+        nome: '',
+        volume: '',
+        unMedida: '',
+        valor: '',
+        fornecedor: {id: '0',
+          empresa: 'Fornecedor X',
+          cnpj: '000.000.00/0001-01',
+          endereco: 'Rua a',
+          descricao: 'Fornecedor de Outra coisa',
+          telefone: '77 00000000',
+          email: "venda@fornecedor.com.br",}
       }],
     text: "",
     loading: {
@@ -267,7 +281,6 @@ export default {
     produtoDialog: {
       id: null,
       nome: "",
-      fornecedor: "",
       volume: "",
       unMedida: "",
       valor: "",
@@ -288,7 +301,8 @@ export default {
           .then((response) => response.json())
           .then((data) => {
             this.loading.searchable = true;
-
+            console.log("Até aqui file")
+            console.log(data);
             this.Produto = data;
           })
           .finally(() => {
@@ -299,25 +313,6 @@ export default {
     },
     loadProduto() {
       this.loading.searchable = false;
-      // this.Fornecedor = [
-      //   {
-      //     id: 1,
-      //     nome: "nome_1",
-      //     sobrenome: "sobrenome_1",
-      //     celular: "10000000000",
-      //     created_at: "2023-04-16T12:22:37.534Z",
-      //     updated_at: "2023-04-16T12:30:40.374Z",
-      //   },
-      //   {
-      //     id: 2,
-      //     nome: "Teste_1",
-      //     sobrenome: "Teste",
-      //     celular: "10000000001",
-      //     created_at: "2023-04-16T14:55:44.864Z",
-      //     updated_at: "2023-04-16T14:55:44.864Z",
-      //   },
-      // ];
-      
       fetch("http://localhost:3000/v1/produto")
         .then((response) => response.json())
         .then((data) => {
@@ -325,12 +320,24 @@ export default {
         });
         
     },
-
-    // },
+    loadFornecedor() {
+      //this.loading.searchable = false;
+      
+      fetch("http://localhost:3000/v1/fornecedor")
+        .then((response) => response.json())
+        .then((data) => {
+          this.Fornecedores = data;
+          //item = JSON.parse(JSON.stringify(item))
+          //this.Fornecedores = JSON.parse(JSON.stringify(this.Fornecedores));
+          //console.log(this.Fornecedores)
+          
+        });
+        
+    },
     submit() {
+      console.log("Pronto para enviar os dados!")
       if (
         this.produtoDialog.nome &&
-        this.produtoDialog.fornecedor &&
         this.produtoDialog.volume &&
         this.produtoDialog.unMedida &&
         this.produtoDialog.valor
@@ -347,11 +354,10 @@ export default {
           },
           body: JSON.stringify({
             nome: this.produtoDialog.nome,
-            cnpj: this.produtoDialog.fornecedor,
-            endereco: this.produtoDialog.volume,
-            linha: this.produtoDialog.unMedida,
-            telefone: this.produtoDialog.valor,
-            fornecedorId: this.selectFornecedor.id
+            volume: this.produtoDialog.volume,
+            unMedida: this.produtoDialog.unMedida,
+            valor: this.produtoDialog.valor,
+            fornecedorID: this.selectFornecedor.id
           }),
         })
           .then((response) => response.json())
@@ -370,7 +376,6 @@ export default {
             this.produtoDialog = {
               id: null,
               nome: "",
-              fornecedor: "",
               volume: "",
               unMedida: "",
               valor: "",
@@ -380,6 +385,7 @@ export default {
           });
       } else {
         this.dialogCreate = true;
+        console.log("Operacao não executada!")
       }
     },
     deleteProduto(produtoId: string) {

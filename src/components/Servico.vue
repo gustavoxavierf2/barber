@@ -164,7 +164,7 @@
 </div>
 </template>
 
-<script  lang="ts">
+<script lang="ts">
 export default {
   mounted() {
     this.loadServicos();
@@ -220,29 +220,12 @@ export default {
     },
     loadServicos() {
       this.loading.searchable = false;
-      // this.servicos = [
-      //   {
-      //     id: 1,
-      //     nome: "nome_1",
-      //     sobrenome: "sobrenome_1",
-      //     celular: "10000000000",
-      //     created_at: "2023-04-16T12:22:37.534Z",
-      //     updated_at: "2023-04-16T12:30:40.374Z",
-      //   },
-      //   {
-      //     id: 2,
-      //     nome: "Teste_1",
-      //     sobrenome: "Teste",
-      //     celular: "10000000001",
-      //     created_at: "2023-04-16T14:55:44.864Z",
-      //     updated_at: "2023-04-16T14:55:44.864Z",
-      //   },
-      // ];
       fetch("http://localhost:3000/v1/servico")
         .then((response) => response.json())
         .then((data) => {
           this.servicos = data;
         });
+
     },
 
     // },

@@ -16,7 +16,6 @@
         <!-- Botao de pesquisa :loading="loading.searchable" -->
         <v-text-field
           v-model="text"
-          
           density="compact"
           variant="underlined"
           label="Pesquisar"
@@ -191,7 +190,7 @@
 </div>
 </template>
 
-<script  lang="ts">
+<script lang="ts">
 export default {
   mounted() {
     this.loadFornecedor();
@@ -235,16 +234,29 @@ export default {
       if (text.length == 0 || text == null) {
         this.loadFornecedor();
       } else {
-        fetch(`http://localhost:3000/v1/fornecedor?nome=${text}`)
+
+
+        fetch(`http://localhost:3000/v1/fornecedor?empresa=${text}`)
           .then((response) => response.json())
           .then((data) => {
-            this.loading.searchable = true;
-
-            this.Fornecedor = data;
+              this.loading.searchable = true;
+              this.Fornecedor = data;
           })
           .finally(() => {
             this.loading.searchable = false;
           });
+          /*
+          if (this.Fornecedor.length == 0){
+              fetch(`http://localhost:3000/v1/fornecedor?cnpj=${text}`)
+              .then((response) => response.json())
+              .then((data) => {
+                  this.loading.searchable = true;
+                  this.Fornecedor = data;
+              })
+              .finally(() => {
+                this.loading.searchable = false;
+              });
+          } */
       }
       this.loading.searchable = true;
     },
@@ -256,9 +268,7 @@ export default {
         .then((data) => {
           console.log("Dados Carregados!");
           this.Fornecedor = data;
-          
         });
-        
     },
     submit() {
       if (
@@ -280,10 +290,10 @@ export default {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            nome: this.fornecedorDialog.empresa,
+            empresa: this.fornecedorDialog.empresa,
             cnpj: this.fornecedorDialog.cnpj,
             endereco: this.fornecedorDialog.endereco,
-            linha: this.fornecedorDialog.linha,
+            descricao: this.fornecedorDialog.linha,
             telefone: this.fornecedorDialog.telefone,
             email: this.fornecedorDialog.email,
           }),
