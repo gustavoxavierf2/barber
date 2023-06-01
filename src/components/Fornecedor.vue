@@ -204,6 +204,7 @@ export default {
         telefone: '',
         email: "",
       }],
+    FornecedorAux: [] as any,
     text: "",
     loading: {
       searchable: false,
@@ -231,23 +232,28 @@ export default {
   methods: {
     //Função para pesquisar no backend
     searchInput(text: string) {
+      
       if (text.length == 0 || text == null) {
         this.loadFornecedor();
       } else {
-
-
         fetch(`http://localhost:3000/v1/fornecedor?empresa=${text}`)
           .then((response) => response.json())
           .then((data) => {
               this.loading.searchable = true;
               this.Fornecedor = data;
+              if(data.length == 0){
+                this.loadFornecedorBYId(text);
+              }
           })
           .finally(() => {
             this.loading.searchable = false;
           });
-          /*
-          if (this.Fornecedor.length == 0){
-              fetch(`http://localhost:3000/v1/fornecedor?cnpj=${text}`)
+      }
+      this.loading.searchable = true;
+    },
+    loadFornecedorBYId(input : String){
+      if (this.Fornecedor.length === 0){
+              fetch(`http://localhost:3000/v1/fornecedor?cnpj=${input}`)
               .then((response) => response.json())
               .then((data) => {
                   this.loading.searchable = true;
@@ -256,17 +262,15 @@ export default {
               .finally(() => {
                 this.loading.searchable = false;
               });
-          } */
-      }
-      this.loading.searchable = true;
+          }
     },
+    
     loadFornecedor() {
       this.loading.searchable = false;
       
       fetch("http://localhost:3000/v1/fornecedor")
         .then((response) => response.json())
         .then((data) => {
-          console.log("Dados Carregados!");
           this.Fornecedor = data;
         });
     },

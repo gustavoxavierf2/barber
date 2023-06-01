@@ -153,7 +153,7 @@
 </div>
 </template>
 
-<script  lang="ts">
+<script lang="ts">
 import { maxValue } from '@vuelidate/validators';
 
 export default {
@@ -197,6 +197,25 @@ export default {
         this.loadClientes();
       } else {
         fetch(`http://localhost:3000/v1/client?nome=${text}`)
+          .then((response) => response.json())
+          .then((data) => {
+            this.loading.searchable = true;
+            this.clientes = data;
+            if(data.length == 0){
+              this.searchByCellPhone(text);
+            }
+          })
+          .finally(() => {
+            this.loading.searchable = true;
+          });
+      }
+      this.loading.searchable = true;
+    },
+    searchByCellPhone(text: string) {
+      if (text.length == 0 || text == null) {
+        this.loadClientes();
+      } else {
+        fetch(`http://localhost:3000/v1/client?phone=${text}`)
           .then((response) => response.json())
           .then((data) => {
             this.loading.searchable = true;

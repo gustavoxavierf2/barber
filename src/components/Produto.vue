@@ -335,7 +335,7 @@ export default {
         
     },
     submit() {
-      console.log("Pronto para enviar os dados!")
+      //console.log("Pronto para enviar os dados!")
       if (
         this.produtoDialog.nome &&
         this.produtoDialog.volume &&

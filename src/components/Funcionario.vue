@@ -258,7 +258,6 @@ export default {
   }),
   methods: {
     searchInput(text: string) {
-      console.log(text);
       if (text.length == 0 || text == null) {
         this.loadFuncionarios();
       } else {
