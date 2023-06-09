@@ -100,6 +100,23 @@
   </v-card>
   <v-dialog v-model="dialogCreate">
     <v-card class="w-50 mx-auto mt-12 table">
+      <v-toolbar-title class="titleDialog">
+        <div class="spaceBetween">
+            <div>
+              Criar Funcionário
+            </div>
+            
+            <v-btn
+                color="red-darken-1"
+                variant="text"
+                @click="() => {
+                    dialogCreate = !dialogCreate
+                }"
+              >
+                Fechar
+              </v-btn>
+        </div>
+      </v-toolbar-title>
       <v-form class="w-100" @submit.prevent>
         <v-container>
           <v-row>
@@ -427,5 +444,23 @@ export default {
 .tableBody {
   background-color: #1c1c1c;
   color: white;
+}
+
+.dataHora{
+  display:flex; 
+  justify-content:center;
+   margin:8px
+}
+
+.titleDialog{
+  font-size: 25px;
+  font-weight: bold;
+  background-color: #2c2c2c;
+  padding: 10px
+}
+
+.spaceBetween{
+  display:flex; 
+  justify-content:space-between
 }
 </style>
