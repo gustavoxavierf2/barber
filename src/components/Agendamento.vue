@@ -19,7 +19,7 @@
             v-model="text"
             density="compact"
             variant="underlined"
-            label="Pesquisar"
+            label="Pesquisar Cliente"
             append-inner-icon="mdi-magnify"
             single-line
             clearable
@@ -52,7 +52,7 @@
             <th class="text-left"><div class="tableColumns">Serviço</div></th>
             <th class="text-left"><div class="tableColumns">Data/Hora</div></th>
             <th class="text-left"><div class="tableColumns">Status</div></th>
-            <th class="text-left"><div class="tableColumns">Ação</div></th>
+            <th class="text-left"><div class="tableColumns">Ações</div></th>
           </tr>
         </thead>
         <tbody class="tableBody">
@@ -212,6 +212,7 @@
                       class="textField"
                       min="08:00"
                       max="19:00"
+                      step="1800"
                       required
                       v-model="agendamentoDialog.horario"
                     />

@@ -115,7 +115,7 @@
                 <v-text-field
                   class="textField"
                   v-model="fornecedorDialog.empresa"
-                  label="Empresa"
+                  label="Empresa (*)"
                   :rules="[(value) => !!value || 'Campo Obrigatório']"
                 ></v-text-field>
               </v-col>
@@ -125,7 +125,7 @@
                 <v-text-field
                   class="textField"
                   v-model="fornecedorDialog.cnpj"
-                  label="CNPJ"
+                  label="CNPJ (*)"
                   :rules="[(value) => !!value || 'Campo Obrigatório']"
                 ></v-text-field>
               </v-col>
@@ -133,7 +133,7 @@
                 <v-text-field
                   class="textField"
                   v-model="fornecedorDialog.endereco"
-                  label="Endereço"
+                  label="Endereço (*)"
                   :rules="[(value) => !!value || 'Campo Obrigatório']"
                 ></v-text-field>
               </v-col>
@@ -143,7 +143,7 @@
                 <v-text-field
                   class="textField"
                   v-model="fornecedorDialog.descricao"
-                  label="Descrição"
+                  label="Descrição (*)"
                   :rules="[(value) => !!value || 'Campo Obrigatório']"
                 ></v-text-field>
               </v-col>
@@ -153,7 +153,7 @@
                 <v-text-field
                   class="textField"
                   v-model="fornecedorDialog.telefone"
-                  label="Telefone"
+                  label="Telefone (*)"
                   :rules="[(value) => !!value || 'Campo Obrigatório']"
                 ></v-text-field>
               </v-col>
@@ -161,7 +161,7 @@
                 <v-text-field
                   class="textField"
                   v-model="fornecedorDialog.email"
-                  label="Email"
+                  label="Email (*)"
                   :rules="[(value) => !!value || 'Campo Obrigatório']"
                 ></v-text-field>
               </v-col>
