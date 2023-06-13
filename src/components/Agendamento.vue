@@ -62,7 +62,29 @@
             <td>{{ item.funcionario.nome }}</td>
             <td>{{ item.servico.nome }}</td>
             <td>{{ formateDate(item.data) + " " + item.horario }}</td>
-            <td>{{ item.status }}</td>
+            <td>
+              <v-chip
+                class="ma-2"
+                color="default"
+                v-if="item.status != 'Concluido' && item.status != 'Cancelado'"
+              >
+                {{ item.status }}
+              </v-chip>
+              <v-chip
+                class="ma-2"
+                color="teal"
+                v-if="item.status == 'Concluido'"
+              >
+                {{ item.status }}
+              </v-chip>
+              <v-chip
+                class="ma-2"
+                color="red"
+                v-if="item.status == 'Cancelado'"
+              >
+                {{ item.status }}
+              </v-chip>
+            </td>
             <td>
               <v-btn
                 icon
