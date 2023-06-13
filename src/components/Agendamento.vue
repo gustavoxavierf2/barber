@@ -408,7 +408,7 @@ export default {
       if (text.length == 0 || text == null) {
         this.loadAgendamentos();
       } else {
-        fetch(`http://localhost:3000/v1/agendamento?cliente=${text}`)
+        fetch(`http://localhost:3000/v1/agendamento?nome=${text}`)
           .then((response) => response.json())
           .then((data) => {
             this.loading.searchable = true;
