@@ -114,10 +114,17 @@ export default {
         title: "Produto",
         link: "/Produto"
       },
-
       {
         title: "Agendamento",
         link: "/Agendamento",
+      },
+      {
+        title: "Venda",
+        link: "/Venda",
+      },
+      {
+        title: "Compra",
+        link: "/Compra",
       },
     ],
 
