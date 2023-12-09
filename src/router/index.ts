@@ -5,6 +5,9 @@ import Funcionario from "../components/Funcionario.vue";
 import Servico from "../components/Servico.vue";
 import Fornecedor from "../components/Fornecedor.vue";
 import Produto from "../components/Produto.vue";
+import Agendamento from "../components/Agendamento.vue";
+import Compra from "../components/Compra.vue";
+import Venda from "../components/Venda.vue";
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -45,6 +48,20 @@ const routes: Array<RouteRecordRaw> = [
     path: "/Produto",
     name: "Produto",
     component: Produto,
+  },
+  {
+    path: "/Agendamento",
+    name: "Agendamento",
+    component: Agendamento,
+  },
+  {
+    path: "/Compra",
+    name: "Compra",
+    component: Compra,
+  },  {
+    path: "/Venda",
+    name: "Venda",
+    component: Venda,
   },
 ];
 

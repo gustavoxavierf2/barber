@@ -8,7 +8,7 @@
       class="mx-auto mt-5"
     >
       <v-toolbar density="compact" class="table">
-        <v-toolbar-title class="tableTitle">Fornecedor</v-toolbar-title>
+        <v-toolbar-title class="tableTitle">Compra</v-toolbar-title>
         <!-- Titulo do Tabela -->
 
         <v-spacer></v-spacer>
@@ -19,12 +19,12 @@
             v-model="text"
             density="compact"
             variant="underlined"
-            label="Pesquisar"
+            label="Pesquisar Compra"
             append-inner-icon="mdi-magnify"
             single-line
             clearable
             hide-details
-            @click:clear="loadFornecedor()"
+            @click:clear="loadCompras()"
             @click:append-inner="searchInput(text)"
           ></v-text-field>
         </v-card-text>
@@ -44,23 +44,21 @@
       <v-table class="contentTable">
         <thead class="tableHead">
           <tr>
-            <th class="text-left"><div class="tableColumns">Empresa</div></th>
-            <th class="text-left"><div class="tableColumns">CNPJ</div></th>
-            <th class="text-left"><div class="tableColumns">Endereço</div></th>
-            <th class="text-left"><div class="tableColumns">Descrição</div></th>
-            <th class="text-left"><div class="tableColumns">Telefone</div></th>
-            <th class="text-left"><div class="tableColumns">Email</div></th>
+            <th class="text-left"><div class="tableColumns">Produto</div></th>
+            <th class="text-left"><div class="tableColumns">Fornecedor</div></th>
+            <th class="text-left"><div class="tableColumns">Quantidade</div></th>
+            <th class="text-left"><div class="tableColumns">Data/Hora</div></th>
+            <th class="text-left"><div class="tableColumns">Valor</div></th>
             <th class="text-left"><div class="tableColumns">Ação</div></th>
           </tr>
         </thead>
         <tbody class="tableBody">
-          <tr v-for="item in Fornecedor" :key="item.id">
-            <td>{{ item.empresa }}</td>
-            <td>{{ item.cnpj }}</td>
-            <td>{{ item.endereco }}</td>
-            <td>{{ item.descricao }}</td>
-            <td>{{ item.telefone }}</td>
-            <td>{{ item.email }}</td>
+          <tr v-for="item in Compras" :key="item.id">
+            <td>{{ item.produto.nome }}</td>
+            <td>{{ item.produto.fornecedor.empresa }}</td>
+            <td>{{ item.quantidade }}</td>
+            <td>{{ formateDate(item.dataCompra)}}</td>
+            <td>{{ item.valor }}</td>
             <td>
               <v-btn
                 icon
@@ -93,7 +91,7 @@
       <v-card class="w-50 mx-auto mt-12 table">
         <v-toolbar-title class="titleDialog">
           <div class="spaceBetween">
-            <div>Criar Fornecedor</div>
+            <div>Criar Compra</div>
 
             <v-btn
               color="red-darken-1"
@@ -111,71 +109,86 @@
         <v-form class="w-100" @submit.prevent>
           <v-container>
             <v-row>
-              <v-col cols="12">
-                <v-text-field
-                  class="textField"
-                  v-model="fornecedorDialog.empresa"
-                  label="Empresa (*)"
+              <v-col cols="8">
+                <v-select
+                  v-model="selectProduto"
+                  label="Produto"
+                  :items="Produtos"
+                  item-title="nome"
                   :rules="[(value) => !!value || 'Campo Obrigatório']"
+                  variant="outlined"
+                  return-object
+                ></v-select>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col cols="8">
+                <v-textarea
+                  counter
+                  label="Nome Fornecedor"
+                  :model-value="selectProduto.fornecedor.empresa"
+                  rows="2"
+                ></v-textarea>
+                <!--/<v-select
+                  v-model="selectFornecedor"
+                  label= "Fornecedor" 
+                  :items= "Fornecedores"
+                  item-title="empresa"
+                  :rules="[(value) => !!value || 'Campo Obrigatório']"
+                  variant="outlined"
+                  return-object
+                ></v-select> -->
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col cols="8">
+                <v-text-field
+                  v-model="compraDialog.quantidade"
+                  label="Quantidade (*)"
+                  type="number"
+                  :rules="[(value) => !!value || 'Campo Obrigatório']"
+                  :counter="10"
                 ></v-text-field>
               </v-col>
             </v-row>
             <v-row>
-              <v-col cols="12" md="6">
+              <v-col cols="8">
                 <v-text-field
-                  class="textField"
-                  v-model="fornecedorDialog.cnpj"
-                  label="CNPJ (*)"
+                  v-model="compraDialog.valor"
+                  label="Valor (*)"
                   :rules="[(value) => !!value || 'Campo Obrigatório']"
-                ></v-text-field>
-              </v-col>
-              <v-col cols="12" md="6">
-                <v-text-field
-                  class="textField"
-                  v-model="fornecedorDialog.endereco"
-                  label="Endereço (*)"
-                  :rules="[(value) => !!value || 'Campo Obrigatório']"
+                  type="number"
+                  :counter="10"
                 ></v-text-field>
               </v-col>
             </v-row>
             <v-row>
-              <v-col cols="12">
-                <v-text-field
-                  class="textField"
-                  v-model="fornecedorDialog.descricao"
-                  label="Descrição (*)"
-                  :rules="[(value) => !!value || 'Campo Obrigatório']"
-                ></v-text-field>
+              <v-col cols="12" md="4">
+                <v-card class="textField">
+                  <div class="dataHora">
+                    <input
+                      type="date"
+                      name="Data"
+                      class="textField"
+                      v-model="compraDialog.date"
+                      min="2018-06-01"
+                      max="2023-12-31"
+                    />
+                  </div>
+                </v-card>
               </v-col>
-            </v-row>
-            <v-row>
-              <v-col cols="12" md="6">
-                <v-text-field
-                  class="textField"
-                  v-model="fornecedorDialog.telefone"
-                  label="Telefone (*)"
-                  :rules="[(value) => !!value || 'Campo Obrigatório']"
-                ></v-text-field>
-              </v-col>
-              <v-col cols="12" md="6">
-                <v-text-field
-                  class="textField"
-                  v-model="fornecedorDialog.email"
-                  label="Email (*)"
-                  :rules="[(value) => !!value || 'Campo Obrigatório']"
-                ></v-text-field>
-              </v-col>
-            </v-row>
-            <v-row>
               <v-col cols="12" md="4" mx="auto">
                 <v-btn
                   type="submit"
                   @click="submit()"
                   block
-                  class="mt-2 mx-auto"
+                  class="mt-1 mx-auto"
                   >Salvar</v-btn
                 >
               </v-col>
+            </v-row>
+            <v-row>
+             
             </v-row>
           </v-container>
         </v-form>
@@ -190,10 +203,10 @@
     >
       <v-card class="table">
         <v-card-title class="text-h5">
-          <div class="table">Cadastro de Fornecedor</div>
+          <div class="table">Cadastro de Compra</div>
         </v-card-title>
         <v-card-text
-          >Deseja confirmar a exclusão do cadastro selecionado?</v-card-text
+          >Deseja confirmar a exclusão do compra realizada?</v-card-text
         >
         <v-card-actions>
           <v-spacer></v-spacer>
@@ -207,7 +220,7 @@
           <v-btn
             color="red-darken-1"
             variant="text"
-            @click="deleteFornecedor(exclusionId)"
+            @click="deleteProduto(exclusionId)"
           >
             Confirmar
           </v-btn>
@@ -221,13 +234,49 @@
 </template>
 
 <script lang="ts">
+import { DateTime } from "luxon";
 export default {
   mounted() {
-    this.loadFornecedor();
+    this.loadCompras();
+    this.loadProdutos();
+    //this.loadFuncionarios();
+    //this.loadServicos();
+    //console.log(this.Fornecedores)
   },
   data: () => ({
-    Fornecedor: [
+    selectFornecedor: {
+      id: "0",
+      empresa: "Selecione o Fornecedor",
+      cnpj: "",
+      endereco: "",
+      descricao: "",
+      telefone: "",
+      email: "",
+    },
+    selectProduto:{
+      id: null,
+      nome: "Selecione o Produto",
+      volume: "",
+      unMedida: "",
+      valor: "",
+      fornecedor: {
+          id: "0",
+          empresa: "Fornecedor X",
+          cnpj: "000.000.00/0001-01",
+          endereco: "Rua a",
+          descricao: "Fornecedor de Outra coisa",
+          telefone: "77 00000000",
+          email: "venda@fornecedor.com.br",
+        }
+    },
+
+    Produtos: [
       {
+      id:"0",
+      volume: "",
+      unMedida: "",
+      valor: "",
+      fornecedor: {
         id: "0",
         empresa: "",
         cnpj: "",
@@ -236,27 +285,67 @@ export default {
         telefone: "",
         email: "",
       },
+      },
     ],
-    FornecedorAux: [] as any,
-    text: "",
-    loading: {
-      searchable: false,
-      tableData: false,
-      creating: false,
-    },
-    dialogCreate: false,
-    dialogExclusion: false,
-    confirmExclusion: false,
-    exclusionId: "",
-    fornecedorDialog: {
-      id: null,
+    Fornecedores: [
+      {
+      id: "0",
       empresa: "",
       cnpj: "",
       endereco: "",
       descricao: "",
       telefone: "",
       email: "",
+      },
+    ],
+
+    Compras: [
+      {
+        id: "0",
+        data: null,
+        valor: null,
+        quantidade: null,
+        dataCompra: null,
+        produto: {
+          id: null,
+          nome: "Selecione o Produto",
+          volume: "",
+          unMedida: "",
+          valor: "",
+          fornecedor: {
+            id: "0",
+            empresa: "Fornecedor X",
+            cnpj: "000.000.00/0001-01",
+            endereco: "Rua a",
+            descricao: "Fornecedor de Outra coisa",
+            telefone: "77 00000000",
+            email: "venda@fornecedor.com.br",
+           }
+        },
+      },
+    ],
+
+    text: "",
+
+    loading: {
+      searchable: false,
+      tableData: false,
+      creating: false,
     },
+
+    dialogCreate: false,
+    dialogExclusion: false,
+    confirmExclusion: false,
+    exclusionId: "",
+
+    compraDialog: {
+      id: null,
+      date: "",
+      quantidade: null,
+      valor: null,
+      produto_id: null,
+    },
+
     alert: {
       message: "",
       isActive: false,
@@ -266,16 +355,13 @@ export default {
     //Função para pesquisar no backend
     searchInput(text: string) {
       if (text.length == 0 || text == null) {
-        this.loadFornecedor();
+        this.loadCompras();
       } else {
-        fetch(`http://localhost:3000/v1/fornecedor?empresa=${text}`)
+        fetch(`http://localhost:3000/v1/compra?nome=${text}`)
           .then((response) => response.json())
           .then((data) => {
             this.loading.searchable = true;
-            this.Fornecedor = data;
-            if (data.length == 0) {
-              this.loadFornecedorBYId(text);
-            }
+            this.Compras = data;
           })
           .finally(() => {
             this.loading.searchable = false;
@@ -283,113 +369,121 @@ export default {
       }
       this.loading.searchable = true;
     },
-    loadFornecedorBYId(input: String) {
-      if (this.Fornecedor.length === 0) {
-        fetch(`http://localhost:3000/v1/fornecedor?cnpj=${input}`)
-          .then((response) => response.json())
-          .then((data) => {
-            this.loading.searchable = true;
-            this.Fornecedor = data;
-          })
-          .finally(() => {
-            this.loading.searchable = false;
-          });
-      }
-    },
-
-    loadFornecedor() {
+    loadCompras() {
       this.loading.searchable = false;
-
+      fetch("http://localhost:3000/v1/Compra")
+        .then((response) => response.json())
+        .then((data) => {
+          this.Compras = data;
+        });
+    },
+    loadFornecedores() {
+      //this.loading.searchable = false;
       fetch("http://localhost:3000/v1/fornecedor")
         .then((response) => response.json())
         .then((data) => {
-          this.Fornecedor = data;
+          this.Clientes = data;
+        });
+    },
+    loadProdutos() {
+      this.loading.searchable = false;
+      fetch("http://localhost:3000/v1/produto")
+        .then((response) => response.json())
+        .then((data) => {
+          this.Produtos = data;
         });
     },
     submit() {
-      if (
-        this.fornecedorDialog.empresa &&
-        this.fornecedorDialog.cnpj &&
-        this.fornecedorDialog.descricao &&
-        this.fornecedorDialog.endereco &&
-        this.fornecedorDialog.email &&
-        this.fornecedorDialog.telefone
-      ) {
+      //console.log("Pronto para enviar os dados!")
+      if (this.compraDialog.date) {
         this.loading.creating = true;
         const url =
-          "http://localhost:3000/v1/fornecedor" +
-          (this.fornecedorDialog.id ? "/" + this.fornecedorDialog.id : "");
-        const method = this.fornecedorDialog.id ? "PUT" : "POST";
+          "http://localhost:3000/v1/Compra" +
+          (this.compraDialog.id ? "/" + this.compraDialog.id : "");
+        const method = this.compraDialog.id ? "PUT" : "POST";
         fetch(url, {
           method,
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            empresa: this.fornecedorDialog.empresa,
-            cnpj: this.fornecedorDialog.cnpj,
-            endereco: this.fornecedorDialog.endereco,
-            descricao: this.fornecedorDialog.descricao,
-            telefone: this.fornecedorDialog.telefone,
-            email: this.fornecedorDialog.email,
+            quantidade: parseInt(this.compraDialog.quantidade,10),
+            valor: parseInt(this.compraDialog.valor,10),
+            produtoID: parseInt(this.selectProduto.id,10),
+            dataCompra: DateTime.fromISO(this.compraDialog.date).toJSON()
           }),
         })
           .then((response) => response.json())
           .then((data) => {
-            console.log("Success:", data);
-            this.alert.message = "Fornecedor salvo com sucesso!";
+            this.alert.message = "Compra salvo com sucesso!";
             this.alert.isActive = true;
           })
           .catch((error) => {
-            this.alert.message = "Erro ao salvar Fornecedor! Tente novamente.";
+            this.alert.message = "Erro ao salvar a Compra! Tente novamente.";
             this.alert.isActive = true;
           })
           .finally(() => {
             this.loading.creating = false;
             this.dialogCreate = false;
-            this.fornecedorDialog = {
+            this.compraDialog = {
               id: null,
-              empresa: "",
-              cnpj: "",
-              endereco: "",
-              descricao: "",
-              telefone: "",
-              email: "",
+              date: "",
+              quantidade: null,
+              valor: null,
+              produto_id: null,
             };
-            this.loadFornecedor();
+            this.loadCompras();
           });
       } else {
         this.dialogCreate = true;
+        console.log("Operacao não executada!");
       }
     },
-    deleteFornecedor(fornecedorId: string) {
+    deleteProduto(compraId: string) {
       this.loading.tableData = true;
-      fetch("http://localhost:3000/v1/fornecedor/" + fornecedorId, {
+      fetch("http://localhost:3000/v1/Compra/" + compraId, {
         method: "DELETE",
       })
         .then((response) => response.json())
         .then((data) => {
-          this.alert.message = "Fornecedor excluído com sucesso!";
+          this.alert.message = "Compra excluída com sucesso!";
           this.alert.isActive = true;
         })
         .catch((error) => {
           console.error("Error:", error);
-          this.alert.message = "Erro ao excluir Fornecedor! Tente novamente.";
+          this.alert.message = "Erro ao excluir Compra! Tente novamente.";
           this.alert.isActive = true;
         })
         .finally(() => {
           this.loading.tableData = false;
-          this.loadFornecedor();
+          this.loadCompras();
           this.dialogExclusion = false;
         });
     },
-    openEditDialog(fornecedorInfo: any) {
-      this.fornecedorDialog = fornecedorInfo;
+    /*openEditDialog(agendamentoInfo: any) {
+      this.agendamentoDialog = agendamentoInfo;
+      this.agendamentoDialog.data = DateTime.fromISO(
+        agendamentoInfo.data
+      ).toFormat("yyyy-MM-dd");
+      this.selectServico = agendamentoInfo.servico;
+      this.selectFuncionario = agendamentoInfo.funcionario;
+      this.selectCliente = agendamentoInfo.cliente;
+      this.dialogCreate = true;
+    },*/
+    openEditDialog(compraInfo: any) {
+      this.compraDialog.id = compraInfo.id;
+      this.compraDialog.quantidade = compraInfo.quantidade;
+      this.compraDialog.valor = compraInfo.valor;
+      this.compraDialog.date = DateTime.fromISO(compraInfo.dataCompra).toFormat("yyyy-MM-dd");
+      this.selectProduto = compraInfo.produto;
       this.dialogCreate = true;
     },
-    openConfirmExclusion(servicoId: string) {
-      this.exclusionId = servicoId;
+    openConfirmExclusion(agendamentoId: string) {
+      this.exclusionId = agendamentoId;
       this.dialogExclusion = true;
+    },
+    formateDate(data: string) {
+      return DateTime.fromISO(data).toFormat("dd/MM/yyyy");
     },
   },
 };
