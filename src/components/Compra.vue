@@ -145,6 +145,7 @@
                 <v-text-field
                   v-model="compraDialog.quantidade"
                   label="Quantidade (*)"
+                  type="number"
                   :rules="[(value) => !!value || 'Campo Obrigatório']"
                   :counter="10"
                 ></v-text-field>
@@ -156,6 +157,7 @@
                   v-model="compraDialog.valor"
                   label="Valor (*)"
                   :rules="[(value) => !!value || 'Campo Obrigatório']"
+                  type="number"
                   :counter="10"
                 ></v-text-field>
               </v-col>
@@ -168,7 +170,7 @@
                       type="date"
                       name="Data"
                       class="textField"
-                      v-model="compraDialog.data"
+                      v-model="compraDialog.date"
                       min="2018-06-01"
                       max="2023-12-31"
                     />
@@ -338,9 +340,9 @@ export default {
 
     compraDialog: {
       id: null,
-      data: null,
-      quantidade: "",
-      valor: "",
+      date: "",
+      quantidade: null,
+      valor: null,
       produto_id: null,
     },
 
@@ -391,116 +393,74 @@ export default {
           this.Produtos = data;
         });
     },
-
-
-
     submit() {
       //console.log("Pronto para enviar os dados!")
-      if (this.agendamentoDialog.data && this.agendamentoDialog.horario) {
+      if (this.compraDialog.date) {
         this.loading.creating = true;
         const url =
-          "http://localhost:3000/v1/agendamento" +
-          (this.agendamentoDialog.id ? "/" + this.agendamentoDialog.id : "");
-        const method = this.agendamentoDialog.id ? "PUT" : "POST";
+          "http://localhost:3000/v1/Compra" +
+          (this.compraDialog.id ? "/" + this.compraDialog.id : "");
+        const method = this.compraDialog.id ? "PUT" : "POST";
         fetch(url, {
           method,
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            descricao: this.agendamentoDialog.descricao,
-            horario: this.agendamentoDialog.horario,
-            cliente_id: this.selectCliente.id,
-            funcionario_id: this.selectFuncionario.id,
-            servico_id: this.selectServico.id,
-            data: DateTime.fromISO(this.agendamentoDialog.data).toFormat(
-              "MM-dd-yyyy"
-            ),
-            status: "Agendado",
+            quantidade: parseInt(this.compraDialog.quantidade,10),
+            valor: parseInt(this.compraDialog.valor,10),
+            produtoID: parseInt(this.selectProduto.id,10),
+            dataCompra: DateTime.fromISO(this.compraDialog.date).toJSON()
           }),
         })
           .then((response) => response.json())
           .then((data) => {
-            this.alert.message = "Agendamento salvo com sucesso!";
+            this.alert.message = "Compra salvo com sucesso!";
             this.alert.isActive = true;
           })
           .catch((error) => {
-            this.alert.message = "Erro ao salvar Agendamento! Tente novamente.";
+            this.alert.message = "Erro ao salvar a Compra! Tente novamente.";
             this.alert.isActive = true;
           })
           .finally(() => {
             this.loading.creating = false;
             this.dialogCreate = false;
-            this.agendamentoDialog = {
+            this.compraDialog = {
               id: null,
-              data: null,
-              descricao: "",
-              horario: "",
-              cliente_id: null,
-              funcionario_id: null,
-              servico_id: null,
+              date: "",
+              quantidade: null,
+              valor: null,
+              produto_id: null,
             };
-            this.loadAgendamentos();
+            this.loadCompras();
           });
       } else {
         this.dialogCreate = true;
         console.log("Operacao não executada!");
       }
     },
-    deleteProduto(agendamentoId: string) {
+    deleteProduto(compraId: string) {
       this.loading.tableData = true;
-      fetch("http://localhost:3000/v1/agendamento/" + agendamentoId, {
+      fetch("http://localhost:3000/v1/Compra/" + compraId, {
         method: "DELETE",
       })
         .then((response) => response.json())
         .then((data) => {
-          this.alert.message = "Agendamento excluído com sucesso!";
+          this.alert.message = "Compra excluída com sucesso!";
           this.alert.isActive = true;
         })
         .catch((error) => {
           console.error("Error:", error);
-          this.alert.message = "Erro ao excluir Agendamento! Tente novamente.";
+          this.alert.message = "Erro ao excluir Compra! Tente novamente.";
           this.alert.isActive = true;
         })
         .finally(() => {
           this.loading.tableData = false;
-          this.loadAgendamentos();
+          this.loadCompras();
           this.dialogExclusion = false;
         });
     },
-    concluirAgendamento(agendamento) {
-      this.loading.tableData = true;
-      fetch("http://localhost:3000/v1/agendamento/" + agendamento.id, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          descricao: agendamento.descricao,
-          horario: agendamento.horario,
-          cliente_id: agendamento.cliente_id,
-          funcionario_id: agendamento.funcionario_id,
-          servico_id: this.selectServico.servico_id,
-          data: DateTime.fromISO(agendamento.data).toFormat("MM-dd-yyyy"),
-          status: "Concluido",
-        }),
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          this.alert.message = "Agendamento concluído com sucesso!";
-          this.alert.isActive = true;
-        })
-        .catch((error) => {
-          console.error("Error:", error);
-          this.alert.message = "Erro ao concluir Agendamento! Tente novamente.";
-          this.alert.isActive = true;
-        })
-        .finally(() => {
-          this.loading.tableData = false;
-          this.loadAgendamentos();
-        });
-    },
-    openEditDialog(agendamentoInfo: any) {
+    /*openEditDialog(agendamentoInfo: any) {
       this.agendamentoDialog = agendamentoInfo;
       this.agendamentoDialog.data = DateTime.fromISO(
         agendamentoInfo.data
@@ -508,6 +468,14 @@ export default {
       this.selectServico = agendamentoInfo.servico;
       this.selectFuncionario = agendamentoInfo.funcionario;
       this.selectCliente = agendamentoInfo.cliente;
+      this.dialogCreate = true;
+    },*/
+    openEditDialog(compraInfo: any) {
+      this.compraDialog.id = compraInfo.id;
+      this.compraDialog.quantidade = compraInfo.quantidade;
+      this.compraDialog.valor = compraInfo.valor;
+      this.compraDialog.date = DateTime.fromISO(compraInfo.dataCompra).toFormat("yyyy-MM-dd");
+      this.selectProduto = compraInfo.produto;
       this.dialogCreate = true;
     },
     openConfirmExclusion(agendamentoId: string) {
