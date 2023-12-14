@@ -8,7 +8,7 @@
       class="mx-auto mt-5"
     >
       <v-toolbar density="compact" class="table">
-        <v-toolbar-title class="tableTitle">Agendamento</v-toolbar-title>
+        <v-toolbar-title class="tableTitle">Venda</v-toolbar-title>
         <!-- Titulo do Tabela -->
 
         <v-spacer></v-spacer>
@@ -19,12 +19,12 @@
             v-model="text"
             density="compact"
             variant="underlined"
-            label="Pesquisar Cliente"
+            label="Pesquisar Venda"
             append-inner-icon="mdi-magnify"
             single-line
             clearable
             hide-details
-            @click:clear="loadAgendamentos()"
+            @click:clear="loadVendas()"
             @click:append-inner="searchInput(text)"
           ></v-text-field>
         </v-card-text>
@@ -44,54 +44,27 @@
       <v-table class="contentTable">
         <thead class="tableHead">
           <tr>
-            <th class="text-left"><div class="tableColumns">Cliente</div></th>
-            <th class="text-left"><div class="tableColumns">Telefone</div></th>
-            <th class="text-left">
-              <div class="tableColumns">Funcionario</div>
-            </th>
-            <th class="text-left"><div class="tableColumns">Serviço</div></th>
+            <th class="text-left"><div class="tableColumns">Produto</div></th>
+            <th class="text-left"><div class="tableColumns">Fornecedor</div></th>
+            <th class="text-left"><div class="tableColumns">Quantidade</div></th>
             <th class="text-left"><div class="tableColumns">Data/Hora</div></th>
-            <th class="text-left"><div class="tableColumns">Status</div></th>
-            <th class="text-left"><div class="tableColumns">Ações</div></th>
+            <th class="text-left"><div class="tableColumns">Valor</div></th>
+            <th class="text-left"><div class="tableColumns">Ação</div></th>
           </tr>
         </thead>
         <tbody class="tableBody">
-          <tr v-for="item in Agendamentos" :key="item.id">
-            <td>{{ item.cliente.nome }}</td>
-            <td>{{ item.cliente.celular }}</td>
-            <td>{{ item.funcionario.nome }}</td>
-            <td>{{ item.servico.nome }}</td>
-            <td>{{ formateDate(item.data) + " " + item.horario }}</td>
-            <td>
-              <v-chip
-                class="ma-2"
-                color="default"
-                v-if="item.status != 'Concluido' && item.status != 'Cancelado'"
-              >
-                {{ item.status }}
-              </v-chip>
-              <v-chip
-                class="ma-2"
-                color="teal"
-                v-if="item.status == 'Concluido'"
-              >
-                {{ item.status }}
-              </v-chip>
-              <v-chip
-                class="ma-2"
-                color="red"
-                v-if="item.status == 'Cancelado'"
-              >
-                {{ item.status }}
-              </v-chip>
-            </td>
+          <tr v-for="item in Vendas" :key="item.id">
+            <td>{{ item.produto.nome }}</td>
+            <td>{{ item.produto.fornecedor.empresa }}</td>
+            <td>{{ item.quantidade }}</td>
+            <td>{{ formateDate(item.dataVenda)}}</td>
+            <td>{{ item.valor }}</td>
             <td>
               <v-btn
                 icon
                 variant="text"
                 density="compact"
                 @click="openEditDialog(item)"
-                v-if="item.status != 'Concluido' && item.status != 'Cancelado'"
               >
                 <v-icon>mdi-pencil-outline</v-icon>
                 <v-tooltip activator="parent" location="bottom"
@@ -102,24 +75,11 @@
                 icon
                 variant="text"
                 density="compact"
-                v-if="item.status != 'Concluido' && item.status != 'Cancelado'"
-                @click="concluirAgendamento(item)"
-              >
-                <v-icon>mdi-check-circle-outline</v-icon>
-                <v-tooltip activator="parent" location="bottom"
-                  >Concluir</v-tooltip
-                >
-              </v-btn>
-              <v-btn
-                icon
-                variant="text"
-                density="compact"
                 @click="openConfirmExclusion(item.id)"
-                v-if="item.status != 'Concluido' && item.status != 'Cancelado'"
               >
-                <v-icon>mdi-close-circle-outline</v-icon>
+                <v-icon>mdi-delete-outline</v-icon>
                 <v-tooltip activator="parent" location="bottom"
-                  >Cancelar</v-tooltip
+                  >Excluir</v-tooltip
                 >
               </v-btn>
             </td>
@@ -131,7 +91,7 @@
       <v-card class="w-50 mx-auto mt-12 table">
         <v-toolbar-title class="titleDialog">
           <div class="spaceBetween">
-            <div>Criar Agendamento</div>
+            <div>Criar Venda</div>
 
             <v-btn
               color="red-darken-1"
@@ -151,9 +111,9 @@
             <v-row>
               <v-col cols="8">
                 <v-select
-                  v-model="selectCliente"
-                  label="Cliente"
-                  :items="Clientes"
+                  v-model="selectProduto"
+                  label="Produto"
+                  :items="Produtos"
                   item-title="nome"
                   :rules="[(value) => !!value || 'Campo Obrigatório']"
                   variant="outlined"
@@ -163,28 +123,43 @@
             </v-row>
             <v-row>
               <v-col cols="8">
-                <v-select
-                  v-model="selectFuncionario"
-                  label="Funcionario"
-                  :items="Funcionarios"
-                  item-title="nome"
+                <v-textarea
+                  counter
+                  label="Nome Fornecedor"
+                  :model-value="selectProduto.fornecedor.empresa"
+                  rows="2"
+                ></v-textarea>
+                <!--/<v-select
+                  v-model="selectFornecedor"
+                  label= "Fornecedor" 
+                  :items= "Fornecedores"
+                  item-title="empresa"
                   :rules="[(value) => !!value || 'Campo Obrigatório']"
                   variant="outlined"
                   return-object
-                ></v-select>
+                ></v-select> -->
               </v-col>
             </v-row>
             <v-row>
               <v-col cols="8">
-                <v-select
-                  v-model="selectServico"
-                  label="Serviço"
-                  :items="Servicos"
-                  item-title="nome"
+                <v-text-field
+                  v-model="VendaDialog.quantidade"
+                  label="Quantidade (*)"
+                  type="number"
                   :rules="[(value) => !!value || 'Campo Obrigatório']"
-                  variant="outlined"
-                  return-object
-                ></v-select>
+                  :counter="10"
+                ></v-text-field>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col cols="8">
+                <v-text-field
+                  v-model="VendaDialog.valor"
+                  label="Valor (*)"
+                  :rules="[(value) => !!value || 'Campo Obrigatório']"
+                  type="number"
+                  :counter="10"
+                ></v-text-field>
               </v-col>
             </v-row>
             <v-row>
@@ -195,41 +170,25 @@
                       type="date"
                       name="Data"
                       class="textField"
-                      v-model="agendamentoDialog.data"
+                      v-model="VendaDialog.date"
                       min="2018-06-01"
                       max="2023-12-31"
                     />
                   </div>
                 </v-card>
               </v-col>
-              <v-col cols="12" md="4">
-                <v-card class="textField">
-                  <div class="dataHora">
-                    <input
-                      type="time"
-                      id="appt"
-                      name="appt"
-                      class="textField"
-                      min="08:00"
-                      max="19:00"
-                      step="1800"
-                      required
-                      v-model="agendamentoDialog.horario"
-                    />
-                  </div>
-                </v-card>
-              </v-col>
-            </v-row>
-            <v-row>
               <v-col cols="12" md="4" mx="auto">
                 <v-btn
                   type="submit"
                   @click="submit()"
                   block
-                  class="mt-2 mx-auto"
+                  class="mt-1 mx-auto"
                   >Salvar</v-btn
                 >
               </v-col>
+            </v-row>
+            <v-row>
+             
             </v-row>
           </v-container>
         </v-form>
@@ -244,11 +203,10 @@
     >
       <v-card class="table">
         <v-card-title class="text-h5">
-          <div class="table">Cadastro de agendamento</div>
+          <div class="table">Cadastro de Venda</div>
         </v-card-title>
         <v-card-text
-          >Deseja confirmar o cancelamento do agendamento
-          selecionado?</v-card-text
+          >Deseja confirmar a exclusão do Venda realizada?</v-card-text
         >
         <v-card-actions>
           <v-spacer></v-spacer>
@@ -279,98 +237,90 @@
 import { DateTime } from "luxon";
 export default {
   mounted() {
-    this.loadAgendamentos();
-    this.loadClientes();
-    this.loadFuncionarios();
-    this.loadServicos();
+    this.loadVendas();
+    this.loadProdutos();
+    //this.loadFuncionarios();
+    //this.loadServicos();
     //console.log(this.Fornecedores)
   },
   data: () => ({
-    selectCliente: {
+    selectFornecedor: {
       id: "0",
-      nome: "Selecione o Cliente",
-      sobrenome: "",
-      celular: "",
-    },
-
-    selectFuncionario: {
-      id: "0",
-      nome: "Selecione o Funcionario",
-      sobrenome: "",
-      celular: "",
-      cpf: "",
+      empresa: "Selecione o Fornecedor",
+      cnpj: "",
       endereco: "",
-      rg: "",
-      salario: 0,
-      setor: "",
-    },
-
-    selectServico: {
-      id: "0",
-      nome: "Selecione o Serviço",
-      valor: 0,
       descricao: "",
+      telefone: "",
+      email: "",
+    },
+    selectProduto:{
+      id: null,
+      nome: "Selecione o Produto",
+      volume: "",
+      unMedida: "",
+      valor: "",
+      fornecedor: {
+          id: "0",
+          empresa: "Fornecedor X",
+          cnpj: "000.000.00/0001-01",
+          endereco: "Rua a",
+          descricao: "Fornecedor de Outra coisa",
+          telefone: "77 00000000",
+          email: "venda@fornecedor.com.br",
+        }
     },
 
-    Clientes: [
+    Produtos: [
       {
+      id:"0",
+      volume: "",
+      unMedida: "",
+      valor: "",
+      fornecedor: {
         id: "0",
-        nome: "Selecione o Cliente",
-        sobrenome: "",
-        celular: "",
-      },
-    ],
-    Funcionarios: [
-      {
-        id: "0",
-        nome: "Selecione o Funcionario",
-        sobrenome: "",
-        celular: "",
-        cpf: "",
+        empresa: "",
+        cnpj: "",
         endereco: "",
-        rg: "",
-        salario: 0,
-        setor: "",
+        descricao: "",
+        telefone: "",
+        email: "",
+      },
       },
     ],
-    Servicos: [
+    Fornecedores: [
       {
-        id: "0",
-        nome: "Selecione o Serviço",
-        valor: 0,
-        descricao: "",
+      id: "0",
+      empresa: "",
+      cnpj: "",
+      endereco: "",
+      descricao: "",
+      telefone: "",
+      email: "",
       },
     ],
 
-    Agendamentos: [
+    Vendas: [
       {
         id: "0",
         data: null,
-        descricao: "",
-        horario: "",
-        status: "",
-        cliente: {
-          id: "0",
-          nome: "",
-          sobrenome: "",
-          celular: "",
-        },
-        funcionario: {
-          id: "0",
-          nome: "",
-          sobrenome: "",
-          celular: "",
-          cpf: "",
-          endereco: "",
-          rg: "",
-          salario: 0,
-          setor: "",
-        },
-        servico: {
-          id: "0",
-          nome: "",
-          valor: 0,
-          descricao: "",
+        valor: null,
+        quantidade: null,
+        dataVenda: null,
+        produto: {
+          id: null,
+          nome: "Selecione o Produto",
+          volume: "",
+          unMedida: "",
+          valor: "",
+          fornecedor: {
+            id: "0",
+            empresa: "Fornecedor X",
+            cnpj: "000.000.00/0001-01",
+            endereco: "Rua a",
+            descricao: "Fornecedor de Outra coisa",
+            telefone: "77 00000000",
+            email: "venda@fornecedor.com.br",
+           }
         },
       },
     ],
@@ -388,14 +338,12 @@ export default {
     confirmExclusion: false,
     exclusionId: "",
 
-    agendamentoDialog: {
+    VendaDialog: {
       id: null,
-      data: null,
-      descricao: "",
-      horario: "",
-      cliente_id: null,
-      funcionario_id: null,
-      servico_id: null,
+      date: "",
+      quantidade: null,
+      valor: null,
+      produto_id: null,
     },
 
     alert: {
@@ -407,13 +355,13 @@ export default {
     //Função para pesquisar no backend
     searchInput(text: string) {
       if (text.length == 0 || text == null) {
-        this.loadAgendamentos();
+        this.loadVendas();
       } else {
-        fetch(`http://localhost:3000/v1/agendamento?nome=${text}`)
+        fetch(`http://localhost:3000/v1/Venda?nome=${text}`)
           .then((response) => response.json())
           .then((data) => {
             this.loading.searchable = true;
-            this.Agendamentos = data;
+            this.Vendas = data;
           })
           .finally(() => {
             this.loading.searchable = false;
@@ -421,145 +369,98 @@ export default {
       }
       this.loading.searchable = true;
     },
-    loadAgendamentos() {
+    loadVendas() {
       this.loading.searchable = false;
-      fetch("http://localhost:3000/v1/agendamento")
+      fetch("http://localhost:3000/v1/Venda")
         .then((response) => response.json())
         .then((data) => {
-          this.Agendamentos = data;
+          this.Vendas = data;
         });
     },
-    loadClientes() {
+    loadFornecedores() {
       //this.loading.searchable = false;
-      fetch("http://localhost:3000/v1/client")
+      fetch("http://localhost:3000/v1/fornecedor")
         .then((response) => response.json())
         .then((data) => {
           this.Clientes = data;
         });
     },
-    loadFuncionarios() {
-      //this.loading.searchable = false;
-      fetch("http://localhost:3000/v1/funcionario")
+    loadProdutos() {
+      this.loading.searchable = false;
+      fetch("http://localhost:3000/v1/produto")
         .then((response) => response.json())
         .then((data) => {
-          this.Funcionarios = data;
-        });
-    },
-    loadServicos() {
-      //this.loading.searchable = false;
-      fetch("http://localhost:3000/v1/servico")
-        .then((response) => response.json())
-        .then((data) => {
-          this.Servicos = data;
+          this.Produtos = data;
         });
     },
     submit() {
       //console.log("Pronto para enviar os dados!")
-      if (this.agendamentoDialog.data && this.agendamentoDialog.horario) {
+      if (this.VendaDialog.date) {
         this.loading.creating = true;
         const url =
-          "http://localhost:3000/v1/agendamento" +
-          (this.agendamentoDialog.id ? "/" + this.agendamentoDialog.id : "");
-        const method = this.agendamentoDialog.id ? "PUT" : "POST";
+          "http://localhost:3000/v1/Venda" +
+          (this.VendaDialog.id ? "/" + this.VendaDialog.id : "");
+        const method = this.VendaDialog.id ? "PUT" : "POST";
         fetch(url, {
           method,
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            descricao: this.agendamentoDialog.descricao,
-            horario: this.agendamentoDialog.horario,
-            cliente_id: this.selectCliente.id,
-            funcionario_id: this.selectFuncionario.id,
-            servico_id: this.selectServico.id,
-            data: DateTime.fromISO(this.agendamentoDialog.data).toFormat(
-              "MM-dd-yyyy"
-            ),
-            status: "Agendado",
+            quantidade: parseInt(this.VendaDialog.quantidade,10),
+            valor: parseInt(this.VendaDialog.valor,10),
+            produtoID: parseInt(this.selectProduto.id,10),
+            dataVenda: DateTime.fromISO(this.VendaDialog.date).toJSON()
           }),
         })
           .then((response) => response.json())
           .then((data) => {
-            this.alert.message = "Agendamento salvo com sucesso!";
+            this.alert.message = "Venda salvo com sucesso!";
             this.alert.isActive = true;
           })
           .catch((error) => {
-            this.alert.message = "Erro ao salvar Agendamento! Tente novamente.";
+            this.alert.message = "Erro ao salvar a Venda! Tente novamente.";
             this.alert.isActive = true;
           })
           .finally(() => {
             this.loading.creating = false;
             this.dialogCreate = false;
-            this.agendamentoDialog = {
+            this.VendaDialog = {
               id: null,
-              data: null,
-              descricao: "",
-              horario: "",
-              cliente_id: null,
-              funcionario_id: null,
-              servico_id: null,
+              date: "",
+              quantidade: null,
+              valor: null,
+              produto_id: null,
             };
-            this.loadAgendamentos();
+            this.loadVendas();
           });
       } else {
         this.dialogCreate = true;
         console.log("Operacao não executada!");
       }
     },
-    deleteProduto(agendamentoId: string) {
+    deleteProduto(VendaId: string) {
       this.loading.tableData = true;
-      fetch("http://localhost:3000/v1/agendamento/" + agendamentoId, {
+      fetch("http://localhost:3000/v1/Venda/" + VendaId, {
         method: "DELETE",
       })
         .then((response) => response.json())
         .then((data) => {
-          this.alert.message = "Agendamento excluído com sucesso!";
+          this.alert.message = "Venda excluída com sucesso!";
           this.alert.isActive = true;
         })
         .catch((error) => {
           console.error("Error:", error);
-          this.alert.message = "Erro ao excluir Agendamento! Tente novamente.";
+          this.alert.message = "Erro ao excluir Venda! Tente novamente.";
           this.alert.isActive = true;
         })
         .finally(() => {
           this.loading.tableData = false;
-          this.loadAgendamentos();
+          this.loadVendas();
           this.dialogExclusion = false;
         });
     },
-    concluirAgendamento(agendamento) {
-      this.loading.tableData = true;
-      fetch("http://localhost:3000/v1/agendamento/" + agendamento.id, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          descricao: agendamento.descricao,
-          horario: agendamento.horario,
-          cliente_id: agendamento.cliente_id,
-          funcionario_id: agendamento.funcionario_id,
-          servico_id: this.selectServico.servico_id,
-          data: DateTime.fromISO(agendamento.data).toFormat("MM-dd-yyyy"),
-          status: "Concluido",
-        }),
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          this.alert.message = "Agendamento concluído com sucesso!";
-          this.alert.isActive = true;
-        })
-        .catch((error) => {
-          console.error("Error:", error);
-          this.alert.message = "Erro ao concluir Agendamento! Tente novamente.";
-          this.alert.isActive = true;
-        })
-        .finally(() => {
-          this.loading.tableData = false;
-          this.loadAgendamentos();
-        });
-    },
-    openEditDialog(agendamentoInfo: any) {
+    /*openEditDialog(agendamentoInfo: any) {
       this.agendamentoDialog = agendamentoInfo;
       this.agendamentoDialog.data = DateTime.fromISO(
         agendamentoInfo.data
@@ -567,6 +468,14 @@ export default {
       this.selectServico = agendamentoInfo.servico;
       this.selectFuncionario = agendamentoInfo.funcionario;
       this.selectCliente = agendamentoInfo.cliente;
+      this.dialogCreate = true;
+    },*/
+    openEditDialog(VendaInfo: any) {
+      this.VendaDialog.id = VendaInfo.id;
+      this.VendaDialog.quantidade = VendaInfo.quantidade;
+      this.VendaDialog.valor = VendaInfo.valor;
+      this.VendaDialog.date = DateTime.fromISO(VendaInfo.dataVenda).toFormat("yyyy-MM-dd");
+      this.selectProduto = VendaInfo.produto;
       this.dialogCreate = true;
     },
     openConfirmExclusion(agendamentoId: string) {
